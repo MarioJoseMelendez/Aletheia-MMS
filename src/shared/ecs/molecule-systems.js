@@ -7,24 +7,29 @@
 // ====================================================================
 
 import * as THREE from 'three';
+import { PDBLoader } from 'three/examples/jsm/loaders/PDBLoader.js';
 import { ComponentType } from './ecs-world.js';
-import { getCPKColor, getRadius, symbolToElement } from './molecule-components.js';
+import { getCPKColor, getRadius, symbolToElement, ElementSymbol } from './molecule-components.js';
 
 // ====================================================================
 // {2} PDB PARSE SYSTEM
 // ====================================================================
 // Takes raw PDB text and fills Position3D + ElementType + BondPairs.
+// Bond pairs are generated using Three.js's PDBLoader which has a
+// robust bond-detection algorithm (atomic distances + element-specific
+// thresholds + CONECT records), giving the characteristic web pattern.
 // ====================================================================
 export class PDBParseSystem {
   constructor() {
     this.lastAtomCount = 0;
+    this.pdbLoader = new PDBLoader();
   }
 
   execute(world, pdbText) {
     const lines = pdbText.split('\n');
     const atoms = [];
-    const bonds = [];
 
+    // 1. Parse atoms with custom text parser (keeps ECS data clean)
     for (const line of lines) {
       if (line.startsWith('ATOM') || line.startsWith('HETATM')) {
         const x = parseFloat(line.substring(30, 38));
@@ -33,18 +38,7 @@ export class PDBParseSystem {
         const elementSymbol = line.substring(76, 78).trim() || line.substring(12, 14).trim();
         const element = symbolToElement(elementSymbol);
 
-        atoms.push({ x, y, z, element });
-      }
-
-      if (line.startsWith('CONECT')) {
-        const parts = line.trim().split(/\s+/);
-        const atomIndex = parseInt(parts[1], 10) - 1;
-        for (let i = 2; i < parts.length; i++) {
-          const bondIndex = parseInt(parts[i], 10) - 1;
-          if (bondIndex >= 0) {
-            bonds.push([atomIndex, bondIndex]);
-          }
-        }
+        atoms.push({ x, y, z, element, elementStr: elementSymbol });
       }
     }
 
@@ -52,7 +46,6 @@ export class PDBParseSystem {
     const { start } = world.createEntities(count);
     const posData = new Float32Array(count * 3);
     const elemData = new Uint8Array(count);
-    const bondData = new Uint16Array(bonds.length * 2);
 
     for (let i = 0; i < count; i++) {
       const atom = atoms[i];
@@ -62,20 +55,83 @@ export class PDBParseSystem {
       elemData[i] = atom.element;
     }
 
+    world.setComponentData(ComponentType.POSITION_3D, start, posData);
+    world.setComponentData(ComponentType.ELEMENT_TYPE, start, elemData);
+    world.setComponentData(ComponentType.ACTIVE_FLAG, start, new Uint8Array(count).fill(1));
+
+    // 2. Generate bond pairs using Three.js PDBLoader bond detection
+    const bonds = this._detectBonds(pdbText, atoms);
+    const bondData = new Uint16Array(bonds.length * 2);
     for (let i = 0; i < bonds.length; i++) {
       bondData[i * 2]     = bonds[i][0];
       bondData[i * 2 + 1] = bonds[i][1];
     }
 
-    world.setComponentData(ComponentType.POSITION_3D, start, posData);
-    world.setComponentData(ComponentType.ELEMENT_TYPE, start, elemData);
-
-    world.setComponentData(ComponentType.ACTIVE_FLAG, start, new Uint8Array(count).fill(1));
-
     world.activeCount = count;
     this.lastAtomCount = count;
 
     return { start, count, bondData, bondCount: bonds.length };
+  }
+
+  _detectBonds(pdbText, atoms) {
+    const bondSet = new Set();
+    const addBond = (a, b) => {
+      if (a === b || a < 0 || b < 0 || a >= atoms.length || b >= atoms.length) return;
+      const key = Math.min(a, b) * atoms.length + Math.max(a, b);
+      bondSet.add(key);
+    };
+
+    try {
+      // Use Three.js PDBLoader for chemically accurate bond detection
+      // PDBLoader returns json.bonds with direct atom index pairs [a, b]
+      const result = this.pdbLoader.parse(pdbText);
+
+      if (result.json && result.json.bonds && result.json.bonds.length > 0) {
+        for (const bond of result.json.bonds) {
+          addBond(bond[0], bond[1]);
+        }
+      }
+    } catch (e) {
+      console.warn('[PDBParse] PDBLoader bond detection failed, using distance fallback:', e.message);
+    }
+
+    // If no bonds detected by PDBLoader, use distance fallback
+    if (bondSet.size === 0 && atoms.length > 1) {
+      this._fallbackBonds(atoms, addBond);
+    }
+
+    return Array.from(bondSet).map(key => [
+      Math.floor(key / atoms.length),
+      key % atoms.length
+    ]);
+  }
+
+  _fallbackBonds(atoms, addBond) {
+    const covalentRadii = {
+      H: 0.31, C: 0.76, N: 0.71, O: 0.66,
+      S: 1.05, P: 1.07, F: 0.57, CL: 0.99,
+      FE: 1.32, ZN: 1.22, CU: 1.32, MN: 1.39,
+      NA: 1.66, K: 2.03, CA: 1.76
+    };
+    const defaultRadius = 0.8;
+
+    for (let i = 0; i < atoms.length; i++) {
+      const r1 = covalentRadii[atoms[i].elementStr] || defaultRadius;
+      for (let j = i + 1; j < atoms.length; j++) {
+        const r2 = covalentRadii[atoms[j].elementStr] || defaultRadius;
+        const bondThreshold = (r1 + r2) * 1.15; // 15% tolerance
+        const thresholdSq = bondThreshold * bondThreshold;
+
+        const dx = atoms[i].x - atoms[j].x;
+        const dy = atoms[i].y - atoms[j].y;
+        const dz = atoms[i].z - atoms[j].z;
+        const distSq = dx * dx + dy * dy + dz * dz;
+
+        if (distSq < thresholdSq) {
+          addBond(i, j);
+        }
+      }
+    }
   }
 }
 
@@ -148,6 +204,7 @@ export class StyleSystem {
 // ====================================================================
 // Builds Three.js InstancedMesh from ECS data.
 // Reuses base geometries (icosahedron for atoms, cylinder for bonds).
+// Both atoms and bonds share the same centroid to stay aligned.
 // ====================================================================
 export class RenderSystem {
   constructor() {
@@ -155,6 +212,7 @@ export class RenderSystem {
     this.baseCylinderGeo = new THREE.CylinderGeometry(1, 1, 1, 12, 1);
     this.atomGroup = null;
     this.bondGroup = null;
+    this.centroid = new THREE.Vector3(0, 0, 0);
   }
 
   execute(world, entityRange) {
@@ -170,13 +228,12 @@ export class RenderSystem {
     const radii = radiusComp.pool;
 
     const group = new THREE.Group();
-    const up = new THREE.Vector3(0, 1, 0);
     const matrix = new THREE.Matrix4();
     const position = new THREE.Vector3();
     const color = new THREE.Color();
     const scale = new THREE.Vector3();
 
-    // --- Center calculation ---
+    // Compute centroid for centering atoms AND bonds
     let cx = 0, cy = 0, cz = 0;
     for (let i = 0; i < count; i++) {
       const off = (start + i) * 3;
@@ -187,10 +244,9 @@ export class RenderSystem {
     cx /= count;
     cy /= count;
     cz /= count;
+    this.centroid.set(cx, cy, cz);
 
-    const offsetVec = new THREE.Vector3(cx, cy, cz);
-
-    // {6} ATOM INSTANCED MESH
+    // Atom InstancedMesh
     const atomMat = new THREE.MeshStandardMaterial({
       roughness: 0.4,
       metalness: 0.1
@@ -224,15 +280,13 @@ export class RenderSystem {
     return group;
   }
 
-  /**
-   * Builds bonds separately (called with BondPairs).
-   */
   buildBonds(world, entityRange, bondData, bondRadius) {
     const { start, count } = entityRange;
     if (!bondData || bondData.length === 0 || bondRadius <= 0) return null;
 
     const posComp = world.getComponent(ComponentType.POSITION_3D);
     const positions = posComp.pool;
+    const { x: cx, y: cy, z: cz } = this.centroid;
 
     const bondCount = bondData.length / 2;
     const bondMat = new THREE.MeshStandardMaterial({
@@ -244,7 +298,7 @@ export class RenderSystem {
     const bondMesh = new THREE.InstancedMesh(this.baseCylinderGeo, bondMat, bondCount);
     const matrix = new THREE.Matrix4();
     const quaternion = new THREE.Quaternion();
-    const scale = new THREE.Vector3();
+    const scaleVec = new THREE.Vector3();
     const startPos = new THREE.Vector3();
     const endPos = new THREE.Vector3();
     const center = new THREE.Vector3();
@@ -254,15 +308,16 @@ export class RenderSystem {
       const ai = bondData[i * 2];
       const bi = bondData[i * 2 + 1];
 
+      // Same centering as atoms: subtract centroid
       startPos.set(
-        positions[(start + ai) * 3],
-        positions[(start + ai) * 3 + 1],
-        positions[(start + ai) * 3 + 2]
+        positions[(start + ai) * 3]     - cx,
+        positions[(start + ai) * 3 + 1] - cy,
+        positions[(start + ai) * 3 + 2] - cz
       );
       endPos.set(
-        positions[(start + bi) * 3],
-        positions[(start + bi) * 3 + 1],
-        positions[(start + bi) * 3 + 2]
+        positions[(start + bi) * 3]     - cx,
+        positions[(start + bi) * 3 + 1] - cy,
+        positions[(start + bi) * 3 + 2] - cz
       );
 
       center.copy(startPos).add(endPos).multiplyScalar(0.5);
@@ -272,9 +327,9 @@ export class RenderSystem {
       direction.normalize();
 
       quaternion.setFromUnitVectors(up, direction);
-      scale.set(bondRadius, length, bondRadius);
+      scaleVec.set(bondRadius, length, bondRadius);
 
-      matrix.compose(center, quaternion, scale);
+      matrix.compose(center, quaternion, scaleVec);
       bondMesh.setMatrixAt(i, matrix);
     }
 

@@ -32,19 +32,29 @@ for (const [sym, val] of Object.entries(Element)) {
 // ====================================================================
 export const CPK_RGB = {
   [Element.H]:  [1.0, 1.0, 1.0],      // White
-  [Element.C]:  [0.565, 0.565, 0.565], // Gray
+  [Element.C]:  [0.565, 0.565, 0.565], // Grey
   [Element.O]:  [1.0, 0.05, 0.05],     // Red
   [Element.N]:  [0.188, 0.314, 0.973], // Blue
   [Element.S]:  [1.0, 1.0, 0.188],     // Yellow
   [Element.P]:  [1.0, 0.502, 0.0],     // Orange
-  [Element.FE]: [0.878, 0.4, 0.2],     // Brown
-  [Element.ZN]: [0.49, 0.502, 0.69],   // Gray-blue
+  [Element.FE]: [0.878, 0.4, 0.2],     // Brown/rust
+  [Element.ZN]: [0.49, 0.502, 0.69],   // Grey-blue
   [Element.CU]: [0.72, 0.45, 0.2],     // Copper
-  [Element.MN]: [0.6, 0.6, 0.6],       // Gray
+  [Element.MN]: [0.6, 0.6, 0.6],       // Grey
   [Element.CL]: [0.12, 0.94, 0.12],    // Green
   [Element.NA]: [0.4, 0.4, 1.0],       // Light blue
   [Element.K]:  [0.6, 0.2, 0.8],       // Purple
   [Element.CA]: [0.24, 0.7, 0.44],     // Dark green
+  [Element.MG]: [0.54, 0.6, 0.78],     // Light purple/blue
+  [Element.F]:  [0.5, 0.8, 0.5],       // Light green
+  [Element.HE]: [0.85, 0.9, 0.2],      // Pale yellow
+  [Element.LI]: [0.6, 0.4, 0.8],       // Purple
+  [Element.BE]: [0.4, 0.8, 0.4],       // Green
+  [Element.B]:  [0.8, 0.6, 0.4],       // Brown
+  [Element.NE]: [0.7, 0.3, 0.9],       // Violet
+  [Element.SI]: [0.5, 0.5, 0.5],       // Grey
+  [Element.AL]: [0.6, 0.6, 0.6],       // Silver
+  [Element.AR]: [0.5, 0.7, 0.9],       // Light blue
 };
 
 const FALLBACK_RGB = [1.0, 0.08, 0.58]; // Bright pink for unmapped
