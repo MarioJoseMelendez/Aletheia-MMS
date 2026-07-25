@@ -2,8 +2,8 @@
 // ====================================================================
 // {1} DURABLE OBJECT — SYNC ROOM
 // ====================================================================
-// Gestiona el estado y las conexiones WebSocket de la sala.
-// Broadcasts eventos (rotación, selección) entre Control y Display.
+// Manages the room's state and WebSocket connections.
+// Broadcasts events (rotation, selection) between Control and Display.
 // ====================================================================
 
 export class SyncRoom {
@@ -14,18 +14,18 @@ export class SyncRoom {
   }
 
   // ====================================================================
-  // {2} MANEJO DE PETICIONES HTTP / WS UPGRADE
+  // {2} HTTP REQUEST / WS UPGRADE HANDLING
   // ====================================================================
   async fetch(request) {
     if (request.headers.get('Upgrade') !== 'websocket') {
       return new Response('Expected Upgrade: websocket', { status: 426 });
     }
 
-    // Crear el par de WebSockets (cliente / servidor)
+    // Create the WebSocket pair (client / server)
     const webSocketPair = new WebSocketPair();
     const [client, server] = Object.values(webSocketPair);
 
-    // Aceptar la conexión en el DO
+    // Accept the connection in the DO
     this.state.acceptWebSocket(server);
     this.sessions.push(server);
 
@@ -36,16 +36,16 @@ export class SyncRoom {
   }
 
   // ====================================================================
-  // {3} EVENTOS WEBSOCKET NATIVOS (DURABLE OBJECT API)
+  // {3} NATIVE WEBSOCKET EVENTS (DURABLE OBJECT API)
   // ====================================================================
   async webSocketMessage(ws, message) {
-    // Retransmitir el mensaje a todos los demás clientes (Broadcast)
+    // Retransmit the message to all other clients (Broadcast)
     for (const session of this.sessions) {
       if (session !== ws) {
         try {
           session.send(message);
         } catch (err) {
-          // Si falla, la sesión probablemente está muerta
+          // If it fails, the session is probably dead
         }
       }
     }

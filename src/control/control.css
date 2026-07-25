@@ -1,8 +1,8 @@
 /* ====================================================================
    ====================================================================
-   {1} CONTROL — ESTILOS GLOBALES
+   {1} CONTROL — GLOBAL STYLES
    ====================================================================
-   Tema oscuro premium, acentos vibrantes, layout flex/grid.
+   Premium dark theme, vibrant accents, flex/grid layout.
    ==================================================================== */
 
 :root {
@@ -27,7 +27,7 @@ body {
 }
 
 /* ====================================================================
-   {2} LAYOUT PRINCIPAL
+   {2} MAIN LAYOUT
    ==================================================================== */
 #app-layout {
   display: grid;
@@ -116,7 +116,7 @@ body {
 }
 
 /* ====================================================================
-   {4} ÁREA PRINCIPAL
+   {4} MAIN AREA
    ==================================================================== */
 #main-area {
   padding: 30px;
@@ -134,7 +134,7 @@ body {
 }
 
 /* ====================================================================
-   {5} CONTROLES 3D Y PREVIEW
+   {5} 3D CONTROLS AND PREVIEW
    ==================================================================== */
 #preview-section {
   flex: 1;
@@ -153,7 +153,7 @@ body {
 }
 
 #preview-container.loading::after {
-  content: 'Cargando PDB...';
+  content: 'Loading PDB...';
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0,0,0,0.6);
@@ -203,7 +203,7 @@ button {
 }
 
 /* ====================================================================
-   {6} CONTROLES DE AUDIO
+   {6} AUDIO CONTROLS
    ==================================================================== */
 #audio-section {
   background: var(--bg-card);

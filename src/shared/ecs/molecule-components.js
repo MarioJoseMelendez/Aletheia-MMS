@@ -1,56 +1,56 @@
 // ====================================================================
 // ====================================================================
-// {1} COMPONENTES MOLECULARES — DEFINICIONES ECS
+// {1} MOLECULAR COMPONENTS — ECS DEFINITIONS
 // ====================================================================
-// Configura los componentes específicos para simulación molecular:
-// posición, elemento químico, color visual, radio, enlaces.
+// Configures the specific components for molecular simulation:
+// position, chemical element, visual color, radius, bonds.
 // ====================================================================
 
 import { ECSWorld, ComponentType } from './ecs-world.js';
 
 // ====================================================================
-// {2} MAPEO DE ELEMENTOS QUÍMICOS (PARA COMPONENTE Uint8Array)
+// {2} CHEMICAL ELEMENT MAPPING (FOR Uint8Array COMPONENT)
 // ====================================================================
 export const Element = {
   H: 0,  HE: 1, LI: 2, BE: 3, B: 4,  C: 5,  N: 6,  O: 7,
   F: 8,  NE: 9, NA: 10, MG: 11, AL: 12, SI: 13, P: 14, S: 15,
   CL: 16, AR: 17, K: 18, CA: 19,
-  // Metales de transición comunes en metaloproteínas
+  // Common transition metals in metalloproteins
   FE: 20, ZN: 21, CU: 22, MN: 23, MG2: 24,
   // Other
   UNKNOWN: 63
 };
 
-// Reverso: de valor numérico a símbolo
+// Reverse: from numeric value to symbol
 export const ElementSymbol = {};
 for (const [sym, val] of Object.entries(Element)) {
   ElementSymbol[val] = sym;
 }
 
 // ====================================================================
-// {3} COLORES CPK (Corey-Pauling-Koltun) EN RGB [0-1]
+// {3} CPK COLORS (Corey-Pauling-Koltun) IN RGB [0-1]
 // ====================================================================
 export const CPK_RGB = {
-  [Element.H]:  [1.0, 1.0, 1.0],      // Blanco
-  [Element.C]:  [0.565, 0.565, 0.565], // Gris
-  [Element.O]:  [1.0, 0.05, 0.05],     // Rojo
-  [Element.N]:  [0.188, 0.314, 0.973], // Azul
-  [Element.S]:  [1.0, 1.0, 0.188],     // Amarillo
-  [Element.P]:  [1.0, 0.502, 0.0],     // Naranja
-  [Element.FE]: [0.878, 0.4, 0.2],     // Café
-  [Element.ZN]: [0.49, 0.502, 0.69],   // Gris-azul
-  [Element.CU]: [0.72, 0.45, 0.2],     // Cobre
-  [Element.MN]: [0.6, 0.6, 0.6],       // Gris
-  [Element.CL]: [0.12, 0.94, 0.12],    // Verde
-  [Element.NA]: [0.4, 0.4, 1.0],       // Azul claro
-  [Element.K]:  [0.6, 0.2, 0.8],       // Púrpura
-  [Element.CA]: [0.24, 0.7, 0.44],     // Verde oscuro
+  [Element.H]:  [1.0, 1.0, 1.0],      // White
+  [Element.C]:  [0.565, 0.565, 0.565], // Gray
+  [Element.O]:  [1.0, 0.05, 0.05],     // Red
+  [Element.N]:  [0.188, 0.314, 0.973], // Blue
+  [Element.S]:  [1.0, 1.0, 0.188],     // Yellow
+  [Element.P]:  [1.0, 0.502, 0.0],     // Orange
+  [Element.FE]: [0.878, 0.4, 0.2],     // Brown
+  [Element.ZN]: [0.49, 0.502, 0.69],   // Gray-blue
+  [Element.CU]: [0.72, 0.45, 0.2],     // Copper
+  [Element.MN]: [0.6, 0.6, 0.6],       // Gray
+  [Element.CL]: [0.12, 0.94, 0.12],    // Green
+  [Element.NA]: [0.4, 0.4, 1.0],       // Light blue
+  [Element.K]:  [0.6, 0.2, 0.8],       // Purple
+  [Element.CA]: [0.24, 0.7, 0.44],     // Dark green
 };
 
-const FALLBACK_RGB = [1.0, 0.08, 0.58]; // Rosa brillante para no mapeados
+const FALLBACK_RGB = [1.0, 0.08, 0.58]; // Bright pink for unmapped
 
 // ====================================================================
-// {4} RADIOS ATÓMICOS POR ESTILO VISUAL
+// {4} ATOMIC RADII BY VISUAL STYLE
 // ====================================================================
 export const RadiusConfig = {
   'ball-and-stick': {
@@ -78,7 +78,7 @@ export const BOND_RADIUS_CONFIG = {
 };
 
 // ====================================================================
-// {5} INICIALIZAR COMPONENTES EN UN MUNDO ECS
+// {5} INITIALIZE COMPONENTS IN AN ECS WORLD
 // ====================================================================
 export function registerMoleculeComponents(world) {
   world.registerComponent(ComponentType.POSITION_3D, Float32Array, 3);
@@ -89,14 +89,14 @@ export function registerMoleculeComponents(world) {
 }
 
 // ====================================================================
-// {6} HELPER: OBTENER COLOR CPK PARA UN ELEMENTO
+// {6} HELPER: GET CPK COLOR FOR AN ELEMENT
 // ====================================================================
 export function getCPKColor(elementValue) {
   return CPK_RGB[elementValue] || FALLBACK_RGB;
 }
 
 // ====================================================================
-// {7} HELPER: OBTENER RADIO PARA UN ELEMENTO Y ESTILO
+// {7} HELPER: GET RADIUS FOR AN ELEMENT AND STYLE
 // ====================================================================
 export function getRadius(elementValue, style) {
   const config = RadiusConfig[style] || RadiusConfig['ball-and-stick'];
@@ -104,7 +104,7 @@ export function getRadius(elementValue, style) {
 }
 
 // ====================================================================
-// {8} PARSER: SÍMBOLO QUÍMICO → ELEMENT ENUM
+// {8} PARSER: CHEMICAL SYMBOL → ELEMENT ENUM
 // ====================================================================
 const PDB_ELEMENT_MAP = {
   H: Element.H, C: Element.C, N: Element.N, O: Element.O,

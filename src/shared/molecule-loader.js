@@ -1,10 +1,10 @@
 // ====================================================================
 // ====================================================================
-// {1} CARGADOR DE MOLÉCULAS (ECS-BASED)
+// {1} MOLECULE LOADER (ECS-BASED)
 // ====================================================================
-// Internamente usa el pipeline ECS (typed arrays + sistemas) en
-// lugar de objetos Three.js dispersos. Expone la misma API pública
-// hacia display.js y controls-panel.js para mantener compatibilidad.
+// Internally uses the ECS pipeline (typed arrays + systems)
+// instead of scattered Three.js objects. Exposes the same public API
+// to display.js and controls-panel.js for compatibility.
 // ====================================================================
 
 import { ECSMoleculeManager } from './ecs/ecs-molecule-manager.js';
@@ -15,7 +15,7 @@ class MoleculeLoader {
   }
 
   // ====================================================================
-  // {2} CARGAR PDB (FETCH → TEXTO CRUDO)
+  // {2} LOAD PDB (FETCH → RAW TEXT)
   // ====================================================================
   async loadPDB(url) {
     const response = await fetch(url);
@@ -25,21 +25,21 @@ class MoleculeLoader {
   }
 
   // ====================================================================
-  // {3} CONSTRUIR GRUPO THREE.JS (PDB TEXT → ECS → INSTANCED MESH)
+  // {3} BUILD THREE.JS GROUP (PDB TEXT → ECS → INSTANCED MESH)
   // ====================================================================
   buildMolecule(pdbText, style = 'ball-and-stick') {
     return this.manager.buildFromPDB(pdbText, style);
   }
 
   // ====================================================================
-  // {4} CAMBIAR ESTILO SIN REPARSEAR (usa datos ECS ya cargados)
+  // {4} CHANGE STYLE WITHOUT REPARSING (uses already loaded ECS data)
   // ====================================================================
   rebuildStyle(style) {
     return this.manager.rebuildStyle(style);
   }
 
   // ====================================================================
-  // {5} ACCESO A METADATOS
+  // {5} METADATA ACCESS
   // ====================================================================
   getAtomCount() {
     return this.manager.getAtomCount();

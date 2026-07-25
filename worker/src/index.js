@@ -2,8 +2,8 @@
 // ====================================================================
 // {1} ALETHEIA WORKER — HONO + CLOUDFLARE BACKEND
 // ====================================================================
-// API REST serverless ultra-resistente a fallos.
-// Soporta D1 SQL, Cloudflare KV, R2 y fallback local/memoria.
+// Ultra fault-tolerant serverless REST API.
+// Supports D1 SQL, Cloudflare KV, R2 and local/memory fallback.
 // ====================================================================
 
 import { Hono } from 'hono';
@@ -16,7 +16,7 @@ const app = new Hono();
 app.use('*', cors());
 
 // ====================================================================
-// {2} MOLECULAS DEMO POR DEFECTO Y ESTADO EN MEMORIA
+// {2} DEFAULT DEMO MOLECULES AND IN-MEMORY STATE
 // ====================================================================
 const DEFAULT_DEMO_MOLECULES = [
   {
@@ -62,7 +62,7 @@ const DEMO_PDB_URLS = {
 const memoryFileStore = new Map();
 
 // ====================================================================
-// {3} HELPER BASE DE DATOS D1
+// {3} D1 DATABASE HELPER
 // ====================================================================
 async function tryGetD1Molecules(db) {
   try {
@@ -76,13 +76,13 @@ async function tryGetD1Molecules(db) {
     const { results } = await db.prepare('SELECT * FROM molecules ORDER BY createdAt DESC').all();
     if (results && results.length > 0) return results;
   } catch (e) {
-    console.warn('D1 no disponible:', e.message);
+    console.warn('D1 not available:', e.message);
   }
   return null;
 }
 
 // ====================================================================
-// {4} RUTAS API Y WEBSOCKET
+// {4} API AND WEBSOCKET ROUTES
 // ====================================================================
 
 // WebSocket Upgrade -> Durable Object
@@ -96,11 +96,11 @@ app.get('/ws', (c) => {
   }
 });
 
-// Archivos (Local Assets / R2 / Memory / RCSB Proxy)
+// Files (Local Assets / R2 / Memory / RCSB Proxy)
 app.get('/api/files/:filename', async (c) => {
   const filename = c.req.param('filename');
 
-  // 1. Memory store (uploads locales)
+  // 1. Memory store (local uploads)
   if (memoryFileStore.has(filename)) {
     return new Response(memoryFileStore.get(filename));
   }
@@ -120,7 +120,7 @@ app.get('/api/files/:filename', async (c) => {
     }
   }
 
-  // 3. Fallback a archivos locales descargados en public/assets/pdb/
+  // 3. Fallback to local files downloaded in public/assets/pdb/
   if (DEMO_PDB_URLS[filename]) {
     try {
       const origin = new URL(c.req.url).origin;

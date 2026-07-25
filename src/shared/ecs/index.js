@@ -1,8 +1,8 @@
 // ====================================================================
 // ====================================================================
-// {1} ECS INDEX — EXPORT PÚBLICO
+// {1} ECS INDEX — PUBLIC EXPORT
 // ====================================================================
-// Punto de entrada único para todo el sistema ECS.
+// Single entry point for the entire ECS system.
 // ====================================================================
 
 export { ECSWorld, ComponentType } from './ecs-world.js';

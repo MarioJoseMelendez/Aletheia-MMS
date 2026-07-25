@@ -1,9 +1,9 @@
 // ====================================================================
 // ====================================================================
-// {1} ESCENA 3D — EXHIBICIÓN
+// {1} 3D SCENE — DISPLAY
 // ====================================================================
-// Configuración de Three.js (Scene, Camera, Renderer, Lights).
-// Se encarga de inyectar la molécula cargada y aplicarle transformaciones.
+// Three.js setup (Scene, Camera, Renderer, Lights).
+// Handles injecting the loaded molecule and applying transformations.
 // ====================================================================
 
 import * as THREE from 'three';
@@ -15,7 +15,7 @@ export class DisplayScene {
 
     this.scene = new THREE.Scene();
     
-    // {2} Fondo Negro Puro
+    // {2} Pure Black Background
     this.scene.background = new THREE.Color(0x000000);
 
     this.camera = new THREE.PerspectiveCamera(
@@ -24,7 +24,7 @@ export class DisplayScene {
       0.1,
       1000
     );
-    // Posición inicial default
+    // Default initial position
     this.camera.position.set(0, 0, 50);
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -44,7 +44,7 @@ export class DisplayScene {
   }
 
   // ====================================================================
-  // {4} CONFIGURACIÓN DE LUCES
+  // {4} LIGHT SETUP
   // ====================================================================
   _setupLights() {
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
@@ -60,7 +60,7 @@ export class DisplayScene {
   }
 
   // ====================================================================
-  // {5} MÉTODOS PÚBLICOS
+  // {5} PUBLIC METHODS
   // ====================================================================
   
   /**

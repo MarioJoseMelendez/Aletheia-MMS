@@ -1,12 +1,12 @@
 // ====================================================================
 // ====================================================================
-// {1} CONSTANTES COMPARTIDAS
+// {1} SHARED CONSTANTS
 // ====================================================================
-// Valores globales utilizados en todo el frontend.
+// Global values used across the entire frontend.
 // ====================================================================
 
 // ====================================================================
-// {2} EVENTOS WEBSOCKET
+// {2} WEBSOCKET EVENTS
 // ====================================================================
 export const WS_EVENTS = {
   SELECT_MOLECULE: 'select-molecule',
@@ -19,7 +19,7 @@ export const WS_EVENTS = {
 };
 
 // ====================================================================
-// {3} ESTILOS DE VISUALIZACIÓN
+// {3} VISUALIZATION STYLES
 // ====================================================================
 export const VISUALIZATION_STYLES = {
   SPHERES: 'spheres',
@@ -28,7 +28,7 @@ export const VISUALIZATION_STYLES = {
 };
 
 // ====================================================================
-// {4} CONFIGURACIÓN GENERAL
+// {4} GENERAL CONFIGURATION
 // ====================================================================
 export const CONFIG = {
   API_BASE_URL: '/api',
@@ -36,17 +36,17 @@ export const CONFIG = {
 };
 
 // ====================================================================
-// {5} COLORES CPK (Corey-Pauling-Koltun)
+// {5} CPK COLORS (Corey-Pauling-Koltun)
 // ====================================================================
-// Mapeo básico de elementos a colores hexadecimales
+// Basic mapping of elements to hex colors
 // ====================================================================
 export const CPK_COLORS = {
-  H: 0xFFFFFF, // Hidrógeno - Blanco
-  C: 0x909090, // Carbono - Gris
-  O: 0xFF0D0D, // Oxígeno - Rojo
-  N: 0x3050F8, // Nitrógeno - Azul
-  S: 0xFFFF30, // Azufre - Amarillo
-  P: 0xFF8000, // Fósforo - Naranja
-  // Fallback para otros elementos
-  DEFAULT: 0xFF1493 // Rosa brillante para detectar elementos no mapeados
+  H: 0xFFFFFF, // Hydrogen - White
+  C: 0x909090, // Carbon - Gray
+  O: 0xFF0D0D, // Oxygen - Red
+  N: 0x3050F8, // Nitrogen - Blue
+  S: 0xFFFF30, // Sulfur - Yellow
+  P: 0xFF8000, // Phosphorus - Orange
+  // Fallback for other elements
+  DEFAULT: 0xFF1493 // Bright pink to detect unmapped elements
 };

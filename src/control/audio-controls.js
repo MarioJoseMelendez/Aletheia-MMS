@@ -1,9 +1,9 @@
 // ====================================================================
 // ====================================================================
-// {1} CONTROLES DE AUDIO
+// {1} AUDIO CONTROLS
 // ====================================================================
-// Gestiona la UI de audio (Play, Pause, Stop) y emite los comandos
-// vía WebSocket hacia la pantalla de exhibición.
+// Manages the audio UI (Play, Pause, Stop) and emits commands
+// via WebSocket to the display screen.
 // ====================================================================
 
 import { WS_EVENTS } from '../shared/constants.js';
@@ -22,7 +22,7 @@ export class AudioControls {
   }
 
   // ====================================================================
-  // {2} HABILITAR/DESHABILITAR UI
+  // {2} ENABLE/DISABLE UI
   // ====================================================================
   setMolecule(moleculeData) {
     if (moleculeData && moleculeData.audioFile) {
@@ -33,7 +33,7 @@ export class AudioControls {
       this.stopBtn.disabled = false;
     } else {
       this.hasAudio = false;
-      this.trackNameLabel.textContent = 'Sin audio seleccionado';
+      this.trackNameLabel.textContent = 'No audio selected';
       this.playBtn.disabled = true;
       this.pauseBtn.disabled = true;
       this.stopBtn.disabled = true;
@@ -41,7 +41,7 @@ export class AudioControls {
   }
 
   // ====================================================================
-  // {3} EMISIÓN DE EVENTOS
+  // {3} EVENT EMISSION
   // ====================================================================
   setupEventListeners() {
     this.playBtn.addEventListener('click', () => {

@@ -1,12 +1,12 @@
 // ====================================================================
 // ====================================================================
-// {1} CONFIGURACIÓN VITE — ALETHEIA
+// {1} VITE CONFIGURATION — ALETHEIA
 // ====================================================================
-// Multi-page app con 3 entry points:
-// - display: pantalla de exhibición fullscreen
-// - control: pantalla de control interactivo
-// - admin: panel de administración
-// Proxy de /api y /ws hacia el backend Cloudflare Worker (o fallback local).
+// Multi-page app with 3 entry points:
+// - display: fullscreen exhibition screen
+// - control: interactive control panel
+// - admin: administration panel
+// Proxies /api and /ws to the Cloudflare Worker backend (or local fallback).
 // ====================================================================
 
 import { defineConfig } from 'vite';
@@ -16,7 +16,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = resolve(__filename, '..');
 
-// Demo data fallback para desarrollo directo en Vite
+// Demo data fallback for direct Vite development
 const DEMO_MOLECULES = [
   {
     id: 'hemoglobin-demo',
@@ -59,7 +59,7 @@ const DEMO_PDB_URLS = {
 export default defineConfig({
 
   // ====================================================================
-  // {2} ENTRY POINTS MULTI-PAGE
+  // {2} MULTI-PAGE ENTRY POINTS
   // ====================================================================
   build: {
     rollupOptions: {
@@ -73,7 +73,7 @@ export default defineConfig({
   },
 
   // ====================================================================
-  // {3} ALIAS DE IMPORTACIÓN
+  // {3} IMPORT ALIAS
   // ====================================================================
   resolve: {
     alias: {
@@ -82,37 +82,54 @@ export default defineConfig({
   },
 
   // ====================================================================
-  // {4} PROXY Y MIDDLEWARE FALLBACK
+  // {4} DEV SERVER — PROXY + FILE FALLBACK
   // ====================================================================
+  plugins: [
+    {
+      name: 'aletheia-dev-fallback',
+      configureServer(server) {
+        // Insert handler at BEGINNING of middleware stack (before proxy)
+        server.middlewares.stack.unshift({
+          route: '',
+          handle: (req, res, next) => {
+            // Serve demo PDB files directly from RCSB, bypassing Worker
+            if (req.url.startsWith('/api/files/')) {
+              const filename = req.url.replace('/api/files/', '');
+              const pdbUrl = DEMO_PDB_URLS[filename];
+              if (pdbUrl) {
+                fetch(pdbUrl)
+                  .then(r => {
+                    if (!r.ok) throw new Error('RCSB fetch failed');
+                    return r.text();
+                  })
+                  .then(text => {
+                    res.writeHead(200, { 'Content-Type': 'text/plain' });
+                    res.end(text);
+                  })
+                  .catch(() => next());
+                return;
+              }
+            }
+            next();
+          }
+        });
+      }
+    }
+  ],
+
   server: {
     port: 5173,
     proxy: {
       '/api': {
         target: 'http://localhost:8787',
         changeOrigin: true,
-        configure: (proxy, options) => {
+        configure: (proxy) => {
           proxy.on('error', (err, req, res) => {
-            // Si el backend Wrangler no responde, Vite responde directamente con los datos demo
+            // If the Wrangler backend does not respond, Vite responds directly with demo data
             if (req.url === '/api/molecules') {
               res.writeHead(200, { 'Content-Type': 'application/json' });
               res.end(JSON.stringify({ molecules: DEMO_MOLECULES }));
               return;
-            }
-            if (req.url.startsWith('/api/files/')) {
-              const filename = req.url.replace('/api/files/', '');
-              if (DEMO_PDB_URLS[filename]) {
-                fetch(DEMO_PDB_URLS[filename])
-                  .then(r => r.text())
-                  .then(body => {
-                    res.writeHead(200, { 'Content-Type': 'text/plain' });
-                    res.end(body);
-                  })
-                  .catch(() => {
-                    res.writeHead(404);
-                    res.end('File not found');
-                  });
-                return;
-              }
             }
             res.writeHead(500);
             res.end('Proxy Error');

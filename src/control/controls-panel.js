@@ -1,10 +1,10 @@
 // ====================================================================
 // ====================================================================
-// {1} COMPONENTE: PANEL DE CONTROLES Y PREVIEW 3D
+// {1} COMPONENT: CONTROLS PANEL AND 3D PREVIEW
 // ====================================================================
-// Gestiona el mini canvas 3D de la vista previa.
-// Mantiene el pivote de rotación 100% bloqueado en el centro 3D (0,0,0)
-// de la molécula para que gire siempre sobre su propio eje.
+// Manages the mini 3D preview canvas.
+// Keeps the rotation pivot 100% locked at the molecule's 3D center (0,0,0)
+// so it always rotates on its own axis.
 // ====================================================================
 
 import * as THREE from 'three';
@@ -29,7 +29,7 @@ export class ControlsPanel {
   }
 
   // ====================================================================
-  // {2} INICIALIZACIÓN THREE.JS (PREVIEW)
+  // {2} THREE.JS INITIALIZATION (PREVIEW)
   // ====================================================================
   initScene() {
     this.scene = new THREE.Scene();
@@ -53,16 +53,16 @@ export class ControlsPanel {
     dirLight.position.set(10, 10, 10);
     this.scene.add(dirLight);
 
-    // {3} OrbitControls: Fijar pivote estricto en el origen (0,0,0)
+    // {3} OrbitControls: Set strict pivot at origin (0,0,0)
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.target.set(0, 0, 0);
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.05;
     
-    // Permitir desplazamiento (Pan) sin alterar el pivote central de rotación
+    // Allow panning without altering the central rotation pivot
     this.controls.screenSpacePanning = true;
 
-    // {4} EMISIÓN DE EVENTOS AL DISPLAY
+    // {4} EVENT EMISSION TO DISPLAY
     this.controls.addEventListener('change', () => {
       wsClient.emit(WS_EVENTS.CAMERA_UPDATE, {
         cameraPos: [this.camera.position.x, this.camera.position.y, this.camera.position.z],
@@ -88,7 +88,7 @@ export class ControlsPanel {
   }
 
   // ====================================================================
-  // {5} EVENTOS UI
+  // {5} UI EVENTS
   // ====================================================================
   setupEventListeners() {
     this.styleButtons.forEach(btn => {
@@ -119,7 +119,7 @@ export class ControlsPanel {
   }
 
   // ====================================================================
-  // {6} CARGA DE PREVIEW
+  // {6} PREVIEW LOADING
   // ====================================================================
   async loadMoleculePreview(moleculeData) {
     this.currentMoleculeData = moleculeData;
@@ -129,7 +129,7 @@ export class ControlsPanel {
       const pdbUrl = `${CONFIG.API_BASE_URL}/files/${moleculeData.pdbFile}`;
       const pdbRawData = await moleculeLoader.loadPDB(pdbUrl);
       
-      // Construir usando ECS pipeline
+      // Build using ECS pipeline
       const newGroup = moleculeLoader.buildMolecule(pdbRawData, this.currentStyle);
       while (this.moleculeGroup.children.length > 0) {
         this.moleculeGroup.remove(this.moleculeGroup.children[0]);
@@ -139,7 +139,7 @@ export class ControlsPanel {
       
       this.resetView();
     } catch (e) {
-      console.error('[Preview] Error cargando PDB', e);
+      console.error('[Preview] Error loading PDB', e);
     } finally {
       this.container.classList.remove('loading');
     }

@@ -1,9 +1,9 @@
 // ====================================================================
 // ====================================================================
-// {1} PANEL DE ADMINISTRACIÓN — ENTRY POINT
+// {1} ADMIN PANEL — ENTRY POINT
 // ====================================================================
-// Carga la lista de moléculas de Cloudflare KV, inicializa el 
-// formulario de upload y renderiza la tabla administrativa.
+// Loads the molecule list from Cloudflare KV, initializes the
+// upload form, and renders the admin table.
 // ====================================================================
 
 import { UploadForm } from './upload-form.js';
@@ -15,7 +15,7 @@ class AdminPanel {
     this.toastContainer = document.getElementById('toast-container');
     
     this.uploadForm = new UploadForm((newMolecule) => {
-      this.showToast(`Molécula "${newMolecule.name}" creada exitosamente`);
+      this.showToast(`Molecule "${newMolecule.name}" created successfully`);
       this.loadMolecules();
     });
 
@@ -23,22 +23,22 @@ class AdminPanel {
   }
 
   // ====================================================================
-  // {2} CARGAR MOLÉCULAS DESDE WORKER / KV
+  // {2} LOAD MOLECULES FROM WORKER / KV
   // ====================================================================
   async loadMolecules() {
     try {
       const res = await fetch(`${CONFIG.API_BASE_URL}/molecules`);
-      if (!res.ok) throw new Error('Error al cargar moléculas');
+      if (!res.ok) throw new Error('Error loading molecules');
       const data = await res.json();
       this.renderTable(data.molecules || []);
     } catch (err) {
-      console.error('[Admin] Error cargando tabla:', err);
-      this.showToast('Error cargando la lista de moléculas', 'error');
+      console.error('[Admin] Error loading table:', err);
+      this.showToast('Error loading molecule list', 'error');
     }
   }
 
   // ====================================================================
-  // {3} RENDERIZADO DE TABLA
+  // {3} TABLE RENDERING
   // ====================================================================
   renderTable(molecules) {
     this.tbody.innerHTML = '';
@@ -46,7 +46,7 @@ class AdminPanel {
     if (molecules.length === 0) {
       this.tbody.innerHTML = `
         <tr>
-          <td colspan="6" class="empty-table">No hay moléculas registradas aún. Click en "+ Nueva Molécula".</td>
+          <td colspan="6" class="empty-table">No molecules registered yet. Click "+ New Molecule".</td>
         </tr>
       `;
       return;
@@ -60,14 +60,14 @@ class AdminPanel {
         <td><strong>${mol.name}</strong></td>
         <td><span class="tag">${mol.category || 'General'}</span></td>
         <td>${mol.atomCount || 'Auto'}</td>
-        <td>${mol.audioFile ? '🎵 Sí' : '❌ No'}</td>
+        <td>${mol.audioFile ? '🎵 Yes' : '❌ No'}</td>
         <td>${dateStr}</td>
         <td>
-          <button class="icon-btn delete-btn" data-id="${mol.id}">Eliminar</button>
+          <button class="icon-btn delete-btn" data-id="${mol.id}">Delete</button>
         </td>
       `;
 
-      // Event listener para eliminar
+      // Event listener for delete
       const delBtn = tr.querySelector('.delete-btn');
       delBtn.addEventListener('click', () => this.deleteMolecule(mol));
 
@@ -76,15 +76,15 @@ class AdminPanel {
   }
 
   // ====================================================================
-  // {4} ACCIONES CRUD (DELETE)
+  // {4} CRUD ACTIONS (DELETE)
   // ====================================================================
   async deleteMolecule(mol) {
-    if (!confirm(`¿Estás seguro de que deseas eliminar "${mol.name}"?`)) {
+    if (!confirm(`Are you sure you want to delete "${mol.name}"?`)) {
       return;
     }
 
-    // NOTA: Para eliminar se agregará la ruta DELETE en la versión final de polish si se requiere
-    this.showToast(`Eliminar "${mol.name}" no está habilitado en demo`, 'info');
+    // NOTE: To delete, the DELETE route will be added in the final polish version if required
+    this.showToast(`Delete "${mol.name}" is not enabled in demo`, 'info');
   }
 
   // ====================================================================
@@ -104,7 +104,7 @@ class AdminPanel {
   }
 
   init() {
-    console.log('[Aletheia] Admin Panel inicializado');
+    console.log('[Aletheia] Admin Panel initialized');
     this.loadMolecules();
   }
 }

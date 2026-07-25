@@ -1,9 +1,9 @@
 // ====================================================================
 // ====================================================================
-// {1} AUTO ROTACIÓN (IDLE MODE)
+// {1} AUTO ROTATION (IDLE MODE)
 // ====================================================================
-// Activa la auto-rotación de la molécula cuando no hay interacción
-// en la pantalla de control después de un tiempo definido.
+// Activates auto-rotation of the molecule when there is no interaction
+// on the control screen after a defined time.
 // ====================================================================
 
 import { CONFIG, WS_EVENTS } from '../shared/constants.js';
@@ -17,7 +17,7 @@ class AutoRotateManager {
   }
 
   // ====================================================================
-  // {2} GESTIÓN DEL TIMER
+  // {2} TIMER MANAGEMENT
   // ====================================================================
   resetTimer() {
     this.isIdle = false;
@@ -35,7 +35,7 @@ class AutoRotateManager {
     this.isIdle = true;
     console.log('[AutoRotate] Idle timeout reached. Starting auto-rotation.');
     
-    // Notificar al control que la pantalla ha entrado en modo idle
+    // Notify the control that the screen has entered idle mode
     wsClient.emit(WS_EVENTS.IDLE_STARTED, {});
     
     if (this.onIdleStart) {
@@ -44,7 +44,7 @@ class AutoRotateManager {
   }
 
   // ====================================================================
-  // {3} LOOP DE ANIMACIÓN
+  // {3} ANIMATION LOOP
   // ====================================================================
   /**
    * Debe ser llamado dentro del requestAnimationFrame principal

@@ -1,13 +1,13 @@
 // ====================================================================
 // ====================================================================
-// {1} ECS WORLD — NÚCLEO DEL SISTEMA DE ENTIDADES
+// {1} ECS WORLD — ENTITY SYSTEM CORE
 // ====================================================================
-// Implementación data-oriented con typed arrays contiguos.
-// Cada entidad es un índice numérico en pools de componentes planos.
+// Data-oriented implementation with contiguous typed arrays.
+// Each entity is a numeric index into flat component pools.
 // ====================================================================
 
 // ====================================================================
-// {2} CONSTANTES
+// {2} CONSTANTS
 // ====================================================================
 const MAX_ENTITIES = 65536;
 const MAX_COMPONENT_TYPES = 64;
@@ -54,7 +54,7 @@ export class ECSWorld {
     }
     const end = this.nextEntityId;
     if (end > MAX_ENTITIES) {
-      throw new Error(`ECSWorld: excedido límite de ${MAX_ENTITIES} entidades`);
+      throw new Error(`ECSWorld: exceeded limit of ${MAX_ENTITIES} entities`);
     }
     return { start, count };
   }
@@ -85,7 +85,7 @@ export class ECSWorld {
    */
   setComponentData(typeId, entityStart, data) {
     const comp = this.components.get(typeId);
-    if (!comp) throw new Error(`Component type ${typeId} no registrado`);
+    if (!comp) throw new Error(`Component type ${typeId} not registered`);
     const offset = entityStart * comp.stride;
     comp.pool.set(data, offset);
     comp.dirty = true;
@@ -98,7 +98,7 @@ export class ECSWorld {
    */
   getComponent(typeId) {
     const comp = this.components.get(typeId);
-    if (!comp) throw new Error(`Component type ${typeId} no registrado`);
+    if (!comp) throw new Error(`Component type ${typeId} not registered`);
     return comp;
   }
 

@@ -1,10 +1,10 @@
 // ====================================================================
 // ====================================================================
-// {1} COMPONENTE: LISTA DE MOLÉCULAS
+// {1} COMPONENT: MOLECULE LIST
 // ====================================================================
-// Obtiene la lista desde el Worker API, renderiza el menú lateral
-// y emite el evento de selección al WebSocket.
-// Incluye datos demo de respaldo instantáneo para garantizar 100% disponibilidad.
+// Fetches the list from the Worker API, renders the sidebar menu
+// and emits the selection event to the WebSocket.
+// Includes instant fallback demo data to guarantee 100% availability.
 // ====================================================================
 
 import { CONFIG, WS_EVENTS } from '../shared/constants.js';
@@ -57,37 +57,37 @@ export class MoleculeList {
   }
 
   // ====================================================================
-  // {2} CARGA DE DATOS (FETCH CON RESPALDO DEMO)
+  // {2} DATA LOADING (FETCH WITH DEMO FALLBACK)
   // ====================================================================
   async loadMolecules() {
     try {
       const response = await fetch(`${CONFIG.API_BASE_URL}/molecules`);
-      if (!response.ok) throw new Error('Respuesta de red no válida');
+      if (!response.ok) throw new Error('Invalid network response');
       const data = await response.json();
       this.molecules = (data && data.molecules && data.molecules.length > 0) 
         ? data.molecules 
         : FALLBACK_DEMO_MOLECULES;
     } catch (error) {
-      console.warn('[MoleculeList] Usando set demo de respaldo:', error);
+      console.warn('[MoleculeList] Using demo fallback set:', error);
       this.molecules = FALLBACK_DEMO_MOLECULES;
     }
     
     this.render(this.molecules);
     
-    // Autoseleccionar la primera molécula para que no se vea vacío
+    // Auto-select the first molecule so it doesn't appear empty
     if (this.molecules.length > 0 && !this.activeId) {
       this.selectMolecule(this.molecules[0]);
     }
   }
 
   // ====================================================================
-  // {3} RENDERIZADO UI
+  // {3} UI RENDERING
   // ====================================================================
   render(moleculesToRender) {
     this.listElement.innerHTML = '';
     
     if (moleculesToRender.length === 0) {
-      this.listElement.innerHTML = '<li class="empty-msg">No se encontraron moléculas.</li>';
+      this.listElement.innerHTML = '<li class="empty-msg">No molecules found.</li>';
       return;
     }
 
@@ -118,16 +118,16 @@ export class MoleculeList {
   }
 
   // ====================================================================
-  // {4} SELECCIÓN Y EMISIÓN
+  // {4} SELECTION AND EMISSION
   // ====================================================================
   selectMolecule(mol) {
     this.activeId = mol.id;
     this.render(this.molecules);
 
-    // 1. Emitir al servidor (Durable Object -> Display)
+    // 1. Emit to server (Durable Object -> Display)
     wsClient.emit(WS_EVENTS.SELECT_MOLECULE, mol);
 
-    // 2. Notificar localmente (para el Preview 3D)
+    // 2. Notify locally (for the 3D Preview)
     if (this.onSelectCallback) {
       this.onSelectCallback(mol);
     }

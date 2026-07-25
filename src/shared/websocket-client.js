@@ -1,9 +1,9 @@
 // ====================================================================
 // ====================================================================
-// {1} CLIENTE WEBSOCKET NATIVO
+// {1} NATIVE WEBSOCKET CLIENT
 // ====================================================================
-// Wrapper sobre WebSocket nativo para reconexión automática y 
-// un sistema de eventos similar a socket.io (emit/on).
+// Wrapper over native WebSocket for automatic reconnection and
+// an event system similar to socket.io (emit/on).
 // ====================================================================
 
 import { CONFIG } from './constants.js';
@@ -21,18 +21,18 @@ class WebSocketClient {
   }
 
   // ====================================================================
-  // {2} CONEXIÓN Y RECONEXIÓN
+  // {2} CONNECTION AND RECONNECTION
   // ====================================================================
   connect() {
     if (this.ws) {
       this.ws.close();
     }
 
-    console.log('[WebSocket] Conectando a', CONFIG.WS_BASE_URL);
+    console.log('[WebSocket] Connecting to', CONFIG.WS_BASE_URL);
     this.ws = new WebSocket(CONFIG.WS_BASE_URL);
 
     this.ws.onopen = () => {
-      console.log('[WebSocket] Conectado exitosamente');
+      console.log('[WebSocket] Connected successfully');
       this.isConnected = true;
       this.reconnectAttempts = 0;
       this._emitLocal('connect', null);
@@ -45,12 +45,12 @@ class WebSocketClient {
           this._emitLocal(payload.type, payload.data);
         }
       } catch (err) {
-        console.error('[WebSocket] Error parseando mensaje', err);
+        console.error('[WebSocket] Error parsing message', err);
       }
     };
 
     this.ws.onclose = () => {
-      console.log('[WebSocket] Desconectado');
+      console.log('[WebSocket] Disconnected');
       this.isConnected = false;
       this._emitLocal('disconnect', null);
       this._attemptReconnect();
@@ -58,7 +58,7 @@ class WebSocketClient {
 
     this.ws.onerror = (err) => {
       console.error('[WebSocket] Error', err);
-      this.ws.close(); // Forzar onclose para reconectar
+      this.ws.close(); // Force onclose to reconnect
     };
   }
 
@@ -66,28 +66,28 @@ class WebSocketClient {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++;
       const timeout = this.reconnectDelay * Math.min(this.reconnectAttempts, 5); // Backoff
-      console.log(`[WebSocket] Intentando reconectar en ${timeout}ms... (Intento ${this.reconnectAttempts})`);
+      console.log(`[WebSocket] Attempting to reconnect in ${timeout}ms... (Attempt ${this.reconnectAttempts})`);
       setTimeout(() => this.connect(), timeout);
     } else {
-      console.error('[WebSocket] Fallo crítico: no se pudo reconectar después de múltiples intentos.');
+      console.error('[WebSocket] Critical failure: could not reconnect after multiple attempts.');
     }
   }
 
   // ====================================================================
-  // {3} API DE EVENTOS (EMIT / ON)
+  // {3} EVENT API (EMIT / ON)
   // ====================================================================
   
-  // Enviar mensaje al servidor (broadcast a otros clientes vía Worker)
+  // Send message to server (broadcast to other clients via Worker)
   emit(type, data = null) {
     if (!this.isConnected || !this.ws) {
-      console.warn(`[WebSocket] Intento de emitir '${type}' pero no hay conexión.`);
+      console.warn(`[WebSocket] Attempt to emit '${type}' but no connection.`);
       return;
     }
     const payload = JSON.stringify({ type, data });
     this.ws.send(payload);
   }
 
-  // Suscribirse a un evento
+  // Subscribe to an event
   on(type, callback) {
     if (!this.listeners.has(type)) {
       this.listeners.set(type, new Set());
@@ -95,21 +95,21 @@ class WebSocketClient {
     this.listeners.get(type).add(callback);
   }
 
-  // Desuscribirse de un evento
+  // Unsubscribe from an event
   off(type, callback) {
     if (this.listeners.has(type)) {
       this.listeners.get(type).delete(callback);
     }
   }
 
-  // Uso interno: disparar callbacks registrados
+  // Internal use: fire registered callbacks
   _emitLocal(type, data) {
     if (this.listeners.has(type)) {
       for (const callback of this.listeners.get(type)) {
         try {
           callback(data);
         } catch (err) {
-          console.error(`[WebSocket] Error en el listener del evento '${type}'`, err);
+          console.error(`[WebSocket] Error in event listener '${type}'`, err);
         }
       }
     }
@@ -117,8 +117,8 @@ class WebSocketClient {
 }
 
 // ====================================================================
-// {4} INSTANCIA SINGLETON
+// {4} SINGLETON INSTANCE
 // ====================================================================
-// Exportamos una única instancia para toda la aplicación.
+// Export a single instance for the entire application.
 // ====================================================================
 export const wsClient = new WebSocketClient();

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Aletheia — Exhibición</title>
-  <meta name="description" content="Aletheia: Visualización de macromoléculas biológicas en 3D" />
+  <title>Aletheia — Exhibition</title>
+  <meta name="description" content="Aletheia: 3D visualization of biological macromolecules" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -16,7 +16,7 @@
        ==================================================================
        {1} CANVAS 3D
        ==================================================================
-       Contenedor del canvas de Three.js. Ocupa el 100% del viewport.
+        Three.js canvas container. Occupies 100% of the viewport.
        ================================================================== -->
   <div id="canvas-container"></div>
 
@@ -24,14 +24,14 @@
        ==================================================================
        {2} LOADING SCREEN — PERSONALIZABLE
        ==================================================================
-       Pantalla de carga. Puedes modificar TODO el HTML y CSS de esta
-       sección libremente. El JS solo controla la clase .hidden.
+        Loading screen. You can freely modify ALL the HTML and CSS of this
+        section. The JS only controls the .hidden class.
        ================================================================== -->
   <!-- LOADING SCREEN START -->
   <div id="loading-screen">
     <div class="loading-content">
       <div class="loading-spinner"></div>
-      <p class="loading-text">Cargando molécula…</p>
+      <p class="loading-text">Loading molecule…</p>
       <div class="loading-bar">
         <div class="loading-bar-fill"></div>
       </div>
@@ -43,8 +43,8 @@
        ==================================================================
        {3} MOLECULE OVERLAY — PERSONALIZABLE
        ==================================================================
-       Desplegable con info de la molécula actual. Puedes modificar
-       TODO el HTML y CSS. El JS solo inyecta texto y controla .hidden.
+        Overlay with info about the current molecule. You can modify
+        ALL the HTML and CSS. The JS only injects text and controls .hidden.
        ================================================================== -->
   <!-- MOLECULE OVERLAY START -->
   <div id="molecule-overlay" class="hidden">
@@ -54,7 +54,7 @@
   <!-- MOLECULE OVERLAY END -->
 
   <!-- ==================================================================
-       {4} SCRIPT PRINCIPAL
+        {4} MAIN SCRIPT
        ================================================================== -->
   <script type="module" src="./display.js"></script>
 

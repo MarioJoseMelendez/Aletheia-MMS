@@ -1,48 +1,48 @@
-# Aletheia — Arquitectura del Sistema
+# Aletheia — System Architecture
 
-> **Aletheia**: Simulador de Macromoléculas Biológicas en 3D para exhibiciones museográficas, ferias científicas y entornos educativos.
+> **Aletheia**: 3D Biological Macromolecule Simulator for museum exhibits, science fairs, and educational environments.
 >
-> **Licencia**: LPEd — Uso libre para museos, educación y gobierno. Uso comercial reservado a **Mario José Melendez Vasquez** y **Kahuna Agency**. Ver [LICENSE.md](./LICENSE.md).
+> **License**: LPEd — Free use for museums, education, and government. Commercial use reserved to **Mario José Melendez Vasquez** and **Kahuna Agency**. See [LICENSE.md](./LICENSE.md).
 
 ---
 
-## Índice
+## Table of Contents
 
-1. [Visión General](#1-visión-general)
-2. [Stack Tecnológico](#2-stack-tecnológico)
-3. [Arquitectura de Pantallas](#3-arquitectura-de-pantallas)
-4. [Flujo de Datos](#4-flujo-de-datos)
-5. [Arquitectura de Datos (ECS + Data-Oriented)](#5-arquitectura-de-datos-ecs--data-oriented)
-6. [Infraestructura Cloudflare](#6-infraestructura-cloudflare)
-7. [Decisiones de Diseño](#7-decisiones-de-diseño)
-8. [Roadmap / Fases](#8-roadmap--fases)
-9. [Licencia](#9-licencia)
+1. [Overview](#1-overview)
+2. [Tech Stack](#2-tech-stack)
+3. [Screen Architecture](#3-screen-architecture)
+4. [Data Flow](#4-data-flow)
+5. [Data Architecture (ECS + Data-Oriented)](#5-data-architecture-ecs--data-oriented)
+6. [Cloudflare Infrastructure](#6-cloudflare-infrastructure)
+7. [Design Decisions](#7-design-decisions)
+8. [Roadmap / Phases](#8-roadmap--phases)
+9. [License](#9-license)
 
 ---
 
-## 1. Visión General
+## 1. Overview
 
-Aletheia es un sistema de **visualización 3D en tiempo real de macromoléculas biológicas** diseñado específicamente para:
+Aletheia is a **real-time 3D visualization system for biological macromolecules** specifically designed for:
 
-- **Museos de ciencia** → Pantalla de exhibición (proyector/led wall) + tablet de control para guías
-- **Ferias científicas** → Stand interactivo donde visitantes exploran moléculas
-- **Aulas y laboratorios** → Herramienta pedagógica para bioquímica y biología molecular
-- **Entidades gubernamentales** → Contenido educativo de acceso público
+- **Science museums** → Exhibition display (projector/led wall) + control tablet for guides
+- **Science fairs** → Interactive booth where visitors explore molecules
+- **Classrooms and labs** → Pedagogical tool for biochemistry and molecular biology
+- **Government entities** → Public-access educational content
 
-### Principios Rectores
+### Guiding Principles
 
-| Principio | Descripción |
+| Principle | Description |
 |-----------|-------------|
-| **Resiliencia total** | El sistema funciona 100% offline con datos demo precargados. La infraestructura cloud es un plus, no un requisito. |
-| **Bajo costo operativo** | Cloudflare Workers (gratis), R2 (almacenamiento barato), sin servidor que mantener. |
-| **UX museográfica** | Interfaz mínima, sin teclados visibles, sin cursores en la pantalla de exhibición. |
-| **Pedagogía primero** | Colores CPK (estándar científico), estilos de visualización intercambiables. |
-| **Display 100% esclavo** | La pantalla de exhibición no tiene lógica propia. Toda acción viene del Control vía WebSocket. Sin auto-rotación, sin idle timer. |
-| **Código abierto** | Transparencia total para instituciones públicas. |
+| **Total resilience** | The system works 100% offline with preloaded demo data. Cloud infrastructure is a plus, not a requirement. |
+| **Low operating cost** | Cloudflare Workers (free), R2 (cheap storage), no server to maintain. |
+| **Museum UX** | Minimal interface, no visible keyboards, no cursors on the exhibition display. |
+| **Pedagogy first** | CPK colors (scientific standard), interchangeable visualization styles. |
+| **Display 100% Slave to Control** | The exhibition display has no logic of its own. Every action comes from Control via WebSocket. No auto-rotation, no idle timer. |
+| **Open source** | Total transparency for public institutions. |
 
 ---
 
-## 2. Stack Tecnológico
+## 2. Tech Stack
 
 ```
 ┌────────────────────────────────────────────────────────────┐
@@ -74,30 +74,30 @@ Aletheia es un sistema de **visualización 3D en tiempo real de macromoléculas 
 └────────────────────────────────────────────────────────────┘
 ```
 
-| Capa | Tecnología | Justificación |
+| Layer | Technology | Justification |
 |------|-----------|---------------|
-| **Build** | Vite 6 (multi-page) | Build ultra-rápido, HMR nativo, proxy dev integrado |
-| **3D** | Three.js r172 | Motor 3D WebGL más maduro, ecosistema enorme |
-| **Backend** | Hono + Cloudflare Workers | Edge computing sin servidor, cold start mínimo, API REST liviana |
-| **WebSocket** | Durable Objects | Broadcast en tiempo real entre pantallas, persistencia de estado |
-| **Database** | D1 (SQLite edge) | Consultas SQL directamente en el edge, sin latencia de DB externa |
-| **KV** | Cloudflare KV | Cache rápido de metadatos de moléculas |
-| **Storage** | Cloudflare R2 | Almacenamiento de archivos PDB y audio, compatible con S3 |
-| **Tiempo real** | WebSocket nativo | Sin dependencias de Socket.IO, protocolo directo |
+| **Build** | Vite 6 (multi-page) | Ultra-fast build, native HMR, integrated dev proxy |
+| **3D** | Three.js r172 | Most mature WebGL 3D engine, huge ecosystem |
+| **Backend** | Hono + Cloudflare Workers | Serverless edge computing, minimal cold start, lightweight REST API |
+| **WebSocket** | Durable Objects | Real-time broadcast between screens, state persistence |
+| **Database** | D1 (SQLite edge) | SQL queries directly at the edge, no external DB latency |
+| **KV** | Cloudflare KV | Fast cache for molecule metadata |
+| **Storage** | Cloudflare R2 | PDB file and audio storage, S3-compatible |
+| **Real-time** | Native WebSocket | No Socket.IO dependencies, direct protocol |
 
 ---
 
-## 3. Arquitectura de Pantallas
+## 3. Screen Architecture
 
 ### 3.1 Display (`/display`)
 
-**Propósito**: Pantalla principal de exhibición. Es 100% esclava del Control — no tiene lógica propia, no auto-rota, no tiene idle. Solo renderiza lo que el Control le ordena.
+**Purpose**: Main exhibition screen. It is 100% slave to Control — no logic of its own, no auto-rotation, no idle. Only renders what Control commands.
 
 ```
 ┌─────────────────────────────────────────────────┐
 │  ┌───────────────────────────────────────────┐  │
 │  │           CANVAS THREE.JS                  │  │
-│  │    (Fondo #000000, cursor: none)           │  │
+│  │    (Background #000000, cursor: none)       │  │
 │  │                                            │  │
 │  │              ○   ○   ○                     │  │
 │  │            ○   ◆   ○   ○                   │  │
@@ -106,87 +106,87 @@ Aletheia es un sistema de **visualización 3D en tiempo real de macromoléculas 
 │  └───────────────────────────────────────────┘  │
 │                                                 │
 │  ┌─────────────────────┐                        │
-│  │ Hemoglobina         │  ← Molecule Overlay    │
-│  │ Proteína tetramérica│    (esquina inferior   │
-│  │ encargada del...    │     izquierda)         │
+│  │ Hemoglobin          │  ← Molecule Overlay    │
+│  │ Tetrameric protein  │    (bottom-left        │
+│  │ responsible for...  │     corner)            │
 │  └─────────────────────┘                        │
 │                                                 │
 │  ┌─────────────────────┐ Loading Screen         │
-│  │  ⟳ Cargando...      │  (se oculta al cargar) │
+│  │  ⟳ Loading...       │  (hidden when loaded)  │
 │  └─────────────────────┘                        │
 └─────────────────────────────────────────────────┘
 ```
 
-**Eventos que escucha (todos del Control)**:
+**Events it listens to (all from Control)**:
 
-| Evento | Acción |
+| Event | Action |
 |--------|--------|
-| `select-molecule` | Carga PDB y renderiza molécula |
-| `camera-update` | Posiciona cámara exactamente como la del Control (position + target) |
-| `style-change` | Cambia estilo visual (ball-and-stick, spheres, sticks) |
-| `audio-control` | Play/Pause/Stop del audio |
-| `reset-view` | Restablece cámara a posición inicial |
+| `select-molecule` | Loads PDB and renders molecule |
+| `camera-update` | Positions camera exactly like Control's (position + target) |
+| `style-change` | Changes visual style (ball-and-stick, spheres, sticks) |
+| `audio-control` | Play/Pause/Stop audio |
+| `reset-view` | Resets camera to initial position |
 
 ### 3.2 Control (`/control`)
 
-**Propósito**: Interfaz táctil para el guía/presentador. Es el cerebro del sistema.
+**Purpose**: Touch interface for the guide/presenter. It is the brain of the system.
 
 ```
 ┌─────────────────────────────────────────────────────┐
 │ ┌──────────────┐ ┌──────────────────────────────┐   │
-│ │ ALETHEIA      │ │  Vista Previa                │   │
-│ │ Simulador...  │ │  ┌──────────────────────┐    │   │
+│ │ ALETHEIA      │ │  Preview                     │   │
+│ │ Simulator...  │ │  ┌──────────────────────┐    │   │
 │ │               │ │  │   Preview 3D         │    │   │
-│ │ 🔍 Buscar...  │ │  │   (OrbitControls)    │    │   │
+│ │ 🔍 Search...  │ │  │   (OrbitControls)    │    │   │
 │ │               │ │  └──────────────────────┘    │   │
 │ │ ┌────────────┐│ │                              │   │
-│ │ │Hemoglobina ││ │  Visualización               │   │
-│ │ │Proteínas   ││ │  [Ball&Stick] [Esferas] [Sticks]│   │
-│ │ ├────────────┤│ │  [Resetear Vista]             │   │
-│ │ │ADN         ││ │                              │   │
-│ │ │Ác. Nucleicos││ │  Audio                       │   │
+│ │ │Hemoglobin ││ │  Visualization               │   │
+│ │ │Proteins   ││ │  [Ball&Stick] [Spheres] [Sticks]│   │
+│ │ ├────────────┤│ │  [Reset View]                │   │
+│ │ │DNA         ││ │                              │   │
+│ │ │Nucleic Acids││ │  Audio                       │   │
 │ │ ├────────────┤│ │  ▶ ⏸ ⏹ ━━━━━━━━━━━━         │   │
-│ │ │tRNA        ││ │  pista_audio.mp3              │   │
+│ │ │tRNA        ││ │  track_audio.mp3              │   │
 │ │ └────────────┘│ │                              │   │
 │ └──────────────┘ └──────────────────────────────┘   │
 └─────────────────────────────────────────────────────┘
 ```
 
-**Eventos que emite**:
+**Events it emits**:
 
-| Evento | Cuándo |
+| Event | When |
 |--------|--------|
-| `select-molecule` | Click en lista de moléculas |
-| `camera-update` | Cada vez que OrbitControls detecta cambio (arrastre, zoom) |
-| `style-change` | Click en botón de estilo |
-| `audio-control` | Click en Play/Pause/Stop |
-| `reset-view` | Click en botón Resetear Vista |
+| `select-molecule` | Click on molecule list |
+| `camera-update` | Each time OrbitControls detects a change (drag, zoom) |
+| `style-change` | Click on style button |
+| `audio-control` | Click on Play/Pause/Stop |
+| `reset-view` | Click on Reset View button |
 
 ### 3.3 Admin (`/admin`)
 
-**Propósito**: Panel de gestión de contenido para curadores.
+**Purpose**: Content management panel for curators.
 
-| Campo | Tipo | Requerido |
+| Field | Type | Required |
 |-------|------|-----------|
-| Nombre | Texto | Sí |
-| Descripción | Textarea | No |
-| Categoría | Texto | No |
-| Archivo PDB | Drag & Drop (.pdb) | Sí |
-| Archivo Audio | Drag & Drop (*) | No |
+| Name | Text | Yes |
+| Description | Textarea | No |
+| Category | Text | No |
+| PDB File | Drag & Drop (.pdb) | Yes |
+| Audio File | Drag & Drop (*) | No |
 
-**Flujo de subida**:
-1. Usuario llena formulario + arrastra archivos
-2. Se envía `multipart/form-data` a `POST /api/molecules`
-3. Worker almacena:
-   - Metadatos en D1 / KV / memoria
-   - Archivos en R2 / memoria
-4. La molécula aparece inmediatamente en la lista de Control
+**Upload flow**:
+1. User fills form + drags files
+2. `multipart/form-data` is sent to `POST /api/molecules`
+3. Worker stores:
+   - Metadata in D1 / KV / memory
+   - Files in R2 / memory
+4. The molecule appears immediately in the Control list
 
 ---
 
-## 4. Flujo de Datos
+## 4. Data Flow
 
-### 4.1 Sincronización en Tiempo Real (WebSocket)
+### 4.1 Real-Time Synchronization (WebSocket)
 
 ```
 ┌─────────┐         ┌──────────────┐         ┌─────────┐
@@ -216,54 +216,54 @@ Aletheia es un sistema de **visualización 3D en tiempo real de macromoléculas 
      │                     │─────────────────────►│
 ```
 
-**SyncRoom** (Durable Object): Mantiene el estado de la sala y hace broadcast a todos los clientes conectados excepto al emisor. El Display es puramente receptor; nunca emite eventos de cámara o control.
+**SyncRoom** (Durable Object): Maintains room state and broadcasts to all connected clients except the sender. The Display is purely a receiver; it never emits camera or control events.
 
-### 4.2 Carga de Datos (API REST)
+### 4.2 Data Loading (REST API)
 
 ```
 ┌────────┐    GET /api/molecules    ┌──────────┐
 │ Control │────────────────────────►│  Worker   │
 │ (Admin) │◄─────── JSON ──────────│  (Hono)   │
 └────────┘                         └─────┬────┘
-                                         │
-                              ┌──────────┼──────────┐
-                              ▼          ▼          ▼
-                            D1 SQL    KV Cache   Mem Store
-                           (primario) (secundario) (fallback)
-                                         
+                                          │
+                               ┌──────────┼──────────┐
+                               ▼          ▼          ▼
+                             D1 SQL    KV Cache   Mem Store
+                            (primary) (secondary) (fallback)
+                                          
 ┌────────┐    GET /api/files/:file    ┌──────────┐
 │ Display │──────────────────────────►│  Worker   │
 │ Control │◄──────── .pdb text ──────│  (Hono)   │
 └────────┘                           └─────┬────┘
-                                           │
-                              ┌────────────┼────────────┐
-                              ▼            ▼            ▼
-                            R2 Bucket   Mem Store   RCSB Proxy
-                           (primario)  (fallback)  (último recurso)
+                                            │
+                               ┌────────────┼────────────┐
+                               ▼            ▼            ▼
+                             R2 Bucket   Mem Store   RCSB Proxy
+                            (primary)  (fallback)  (last resort)
 ```
 
 ---
 
-## 5. Arquitectura de Datos (ECS + Data-Oriented)
+## 5. Data Architecture (ECS + Data-Oriented)
 
-### 5.1 Motivación
+### 5.1 Motivation
 
-La representación tradicional de moléculas como objetos Three.js (`Mesh`, `Group`, `BufferGeometry`) mezcla datos con lógica de renderizado. Para una simulación eficiente, adoptamos un enfoque **ECS (Entity Component System)** con almacenamiento en **typed arrays** contiguos, inspirado en la programación orientada a datos (Data-Oriented Design).
+The traditional representation of molecules as Three.js objects (`Mesh`, `Group`, `BufferGeometry`) mixes data with rendering logic. For efficient simulation, we adopt an **ECS (Entity Component System)** approach with storage in contiguous **typed arrays**, inspired by Data-Oriented Design.
 
-### 5.2 Estructura ECS
+### 5.2 ECS Structure
 
 ```
 ┌────────────────────────────────────────────────┐
 │                  ECS World                       │
 ├────────────────────────────────────────────────┤
-│  Entities: pool de IDs (índices numéricos)      │
+│  Entities: pool of IDs (numeric indices)        │
 │                                                  │
 │  ┌──────────┬──────────┬──────────┬──────────┐  │
 │  │ Entity 0 │ Entity 1 │ Entity 2 │ Entity 3 │  │
-│  │ (Átomo)  │ (Átomo)  │ (Átomo)  │ (Átomo)  │  │
+│  │ (Atom)   │ (Atom)   │ (Atom)   │ (Atom)   │  │
 │  └──────────┴──────────┴──────────┴──────────┘  │
 │                                                  │
-│  Componentes (Typed Arrays contiguos):            │
+│  Components (Contiguous Typed Arrays):            │
 │                                                  │
 │  Position3D  │ x0 y0 z0 │ x1 y1 z1 │ x2 y2 z2 │  │
 │  (Float32Array * 3)                              │
@@ -278,177 +278,177 @@ La representación tradicional de moléculas como objetos Three.js (`Mesh`, `Gro
 │  (Float32Array)                                   │
 │                                                  │
 │  BondPairs   │ a0b0 a1b1 │ a2b2 a3b3 │ ...     │  │
-│  (Uint16Array * 2 por enlace)                    │
+│  (Uint16Array * 2 per bond)                     │
 └──────────────────────────────────────────────────┘
 ```
 
-### 5.3 Componentes
+### 5.3 Components
 
-| Componente | Tipo | Descripción |
+| Component | Type | Description |
 |-----------|------|-------------|
-| `Position3D` | `Float32Array(n * 3)` | Coordenadas x,y,z en angstroms |
-| `ElementType` | `Uint8Array(n)` | Tipo de elemento químico (enum) |
-| `VisualColor` | `Float32Array(n * 3)` | Color r,g,b normalizado [0-1] |
-| `VisualRadius` | `Float32Array(n)` | Radio de esfera para render |
-| `BondPairs` | `Uint16Array(m * 2)` | Pares de índices de átomos enlazados |
-| `ActiveFlag` | `Uint8Array(n)` | 0/1 para habilitar/deshabilitar entidades |
+| `Position3D` | `Float32Array(n * 3)` | x,y,z coordinates in angstroms |
+| `ElementType` | `Uint8Array(n)` | Chemical element type (enum) |
+| `VisualColor` | `Float32Array(n * 3)` | r,g,b normalized color [0-1] |
+| `VisualRadius` | `Float32Array(n)` | Sphere radius for rendering |
+| `BondPairs` | `Uint16Array(m * 2)` | Pairs of bonded atom indices |
+| `ActiveFlag` | `Uint8Array(n)` | 0/1 to enable/disable entities |
 
-### 5.4 Sistemas
+### 5.4 Systems
 
-| Sistema | Entrada | Salida | Descripción |
+| System | Input | Output | Description |
 |---------|---------|--------|-------------|
-| `PDBParseSystem` | Texto PDB | Llena Position3D + ElementType + BondPairs | Transforma el archivo PDB en datos ECS crudos |
-| `ColorSystem` | ElementType | Llena VisualColor | Asigna colores CPK según elemento |
-| `StyleSystem` | ElementType + estilo | Llena VisualRadius | Calcula radios según estilo visual (ball-and-stick, spheres, sticks) |
-| `RenderSystem` | Position3D + VisualColor + VisualRadius + BondPairs | InstancedMesh Three.js | Construye la geometría optimizada con instancing |
+| `PDBParseSystem` | PDB text | Fills Position3D + ElementType + BondPairs | Transforms PDB file into raw ECS data |
+| `ColorSystem` | ElementType | Fills VisualColor | Assigns CPK colors per element |
+| `StyleSystem` | ElementType + style | Fills VisualRadius | Calculates radii based on visual style (ball-and-stick, spheres, sticks) |
+| `RenderSystem` | Position3D + VisualColor + VisualRadius + BondPairs | Three.js InstancedMesh | Builds optimized geometry with instancing |
 
-### 5.5 Beneficios del Enfoque ECS
+### 5.5 Benefits of the ECS Approach
 
-| Beneficio | Explicación |
+| Benefit | Explanation |
 |-----------|-------------|
-| **Cache locality** | Los datos de posición de todos los átomos están en un bloque contiguo de memoria (Float32Array). La CPU aprovecha el caché L1/L2 al iterar. |
-| **SIMD-friendly** | Los typed arrays son procesables con instrucciones SIMD para operaciones vectoriales. |
-| **Instancing nativo** | Three.js `InstancedMesh` se alimenta directamente de matrices calculadas a partir de arrays planos. |
-| **Serialización barata** | Enviar un Float32Array por WebSocket es trivial: `ws.send(positionBuffer.buffer)`. Sin JSON, sin overhead. |
-| **Separación concerns** | Los datos de simulación (posición, elemento) están separados de los datos de presentación (color, radio). |
-| **Mutable eficiente** | Cambiar el estilo visual solo reescribe `VisualRadius` sin tocar `Position3D`. No hay objetos que reconstruir. |
+| **Cache locality** | All atom position data is in one contiguous memory block (Float32Array). The CPU leverages L1/L2 cache when iterating. |
+| **SIMD-friendly** | Typed arrays can be processed with SIMD instructions for vector operations. |
+| **Native instancing** | Three.js `InstancedMesh` is fed directly from matrices calculated from flat arrays. |
+| **Cheap serialization** | Sending a Float32Array over WebSocket is trivial: `ws.send(positionBuffer.buffer)`. No JSON, no overhead. |
+| **Separation of concerns** | Simulation data (position, element) is separated from presentation data (color, radius). |
+| **Efficient mutation** | Changing the visual style only rewrites `VisualRadius` without touching `Position3D`. No objects to rebuild. |
 
-### 5.6 Pipeline de Carga
+### 5.6 Loading Pipeline
 
 ```
 PDB Text (raw)
     │
     ▼
 PDBParseSystem
-    │  → entities 0..N creadas
-    │  → Position3D llenado con coordenadas atómicas
-    │  → ElementType llenado con símbolos químicos
-    │  → BondPairs llenado con enlaces covalentes
+    │  → entities 0..N created
+    │  → Position3D filled with atomic coordinates
+    │  → ElementType filled with chemical symbols
+    │  → BondPairs filled with covalent bonds
     ▼
 ColorSystem
-    │  → VisualColor llenado con colores CPK
-    │    (H=blanco, C=gris, O=rojo, N=azul, S=amarillo, P=naranja)
+    │  → VisualColor filled with CPK colors
+    │    (H=white, C=gray, O=red, N=blue, S=yellow, P=orange)
     ▼
-StyleSystem (según estilo activo)
-    │  → VisualRadius calculado:
+StyleSystem (according to active style)
+    │  → VisualRadius calculated:
     │    ball-and-stick: C=0.4, H=0.3, O=0.35...
-    │    spheres: todos a 1.5 (esferas grandes)
-    │    sticks: todos a 0.2 (solo varillas delgadas)
+    │    spheres: all at 1.5 (large spheres)
+    │    sticks: all at 0.2 (thin rods only)
     ▼
 RenderSystem
-    │  → Itera Position3D + VisualColor + VisualRadius
-    │  → Construye matrices de transformación 4x4
-    │  → Alimenta InstancedMesh de Three.js
+    │  → Iterates Position3D + VisualColor + VisualRadius
+    │  → Builds 4x4 transformation matrices
+    │  → Feeds Three.js InstancedMesh
     ▼
 Three.js Scene
 ```
 
 ---
 
-## 6. Infraestructura Cloudflare
+## 6. Cloudflare Infrastructure
 
-### 6.1 Componentes
+### 6.1 Components
 
-| Recurso | Propósito | Estrategia de Fallback |
+| Resource | Purpose | Fallback Strategy |
 |---------|-----------|------------------------|
-| **Worker** (Hono) | API REST + WebSocket upgrade | N/A (siempre disponible) |
-| **D1** | Base de datos SQL primaria | Si no existe → KV → Memoria |
-| **KV** | Cache de moléculas | Si falla → Datos demo en memoria |
-| **R2** | Almacenamiento de archivos | Si falla → Mem store → RCSB proxy |
-| **Durable Object** | Sala de sincronización WS | Si no disponible → WS falla graceful |
+| **Worker** (Hono) | REST API + WebSocket upgrade | N/A (always available) |
+| **D1** | Primary SQL database | If missing → KV → Memory |
+| **KV** | Molecule cache | If it fails → Demo data in memory |
+| **R2** | File storage | If it fails → Mem store → RCSB proxy |
+| **Durable Object** | WS sync room | If unavailable → WS gracefully degrades |
 
-### 6.2 Estrategia de Fallback
+### 6.2 Fallback Strategy
 
 ```
 Worker Request
     │
-    ├── D1 disponible? ──Sí──► Responder con D1
+    ├── D1 available? ──Yes──► Respond with D1
     │   No
-    ├── KV disponible? ───Sí──► Responder con KV
+    ├── KV available? ───Yes──► Respond with KV
     │   No
-    └── Usar memoria local ──► Responder con datos demo
+    └── Use local memory ──► Respond with demo data
 ```
 
-Esta estrategia garantiza que Aletheia funcione incluso si:
-- No hay bindings de Cloudflare configurados en desarrollo local
-- D1 está en mantenimiento
-- KV tiene un error transitorio
-- R2 no responde
+This strategy ensures Aletheia works even if:
+- No Cloudflare bindings are configured in local development
+- D1 is under maintenance
+- KV has a transient error
+- R2 is not responding
 
 ---
 
-## 7. Decisiones de Diseño
+## 7. Design Decisions
 
-### 7.1 Display 100% Esclavo del Control
+### 7.1 Display 100% Slave to Control
 
-**Decisión**: El Display no tiene auto-rotación, ni idle timer, ni lógica de movimiento propia. Toda acción de cámara (rotación, zoom, reset) viene exclusivamente del Control vía WebSocket.
+**Decision**: The Display has no auto-rotation, no idle timer, and no movement logic of its own. Every camera action (rotation, zoom, reset) comes exclusively from Control via WebSocket.
 
-**Motivación**: Se eliminó el desfase que ocurría cuando el Display auto-rotaba mientras el Control no, causando que al intentar retomar el control la molécula ya no respondiera correctamente. La sincronización ahora es perfecta porque la cámara del Display copia exactamente `camera.position` y `controls.target` del Control en cada frame.
+**Motivation**: The drift that occurred when the Display auto-rotated while Control did not was eliminated, causing the molecule to no longer respond correctly when trying to regain control. Synchronization is now perfect because the Display's camera copies exactly `camera.position` and `controls.target` from Control every frame.
 
-### 7.2 Three.js con InstancedMesh en lugar de Mesh individual
+### 7.2 Three.js InstancedMesh Instead of Individual Meshes
 
-**Decisión**: Usar `InstancedMesh` para átomos y enlaces.
+**Decision**: Use `InstancedMesh` for atoms and bonds.
 
-**Motivación**: Una molécula como la Hemoglobina (~5000 átomos) generaría 5000 objetos `Mesh` individuales. Cada Mesh tiene overhead de 1 draw call. `InstancedMesh` reduce todo a **2 draw calls** (átomos + enlaces).
+**Motivation**: A molecule like Hemoglobin (~5000 atoms) would generate 5000 individual `Mesh` objects. Each Mesh has an overhead of 1 draw call. `InstancedMesh` reduces everything to **2 draw calls** (atoms + bonds).
 
-### 7.3 Sincronización por posición de cámara en lugar de quaternions
+### 7.3 Camera Position Synchronization Instead of Quaternions
 
-**Decisión**: Enviar `cameraPos + targetPos` en lugar de quaternions invertidos.
+**Decision**: Send `cameraPos + targetPos` instead of inverted quaternions.
 
-**Motivación**: El enfoque anterior enviaba un quaternion de la cámara del Control, lo invertía, y lo aplicaba al `moleculeGroup` del Display. Esto causaba desfases porque la rotación del grupo y la cámara son transformaciones inversas. Ahora se envía la posición exacta de la cámara y el punto al que mira, y el Display copia esos valores directamente. La vista es idéntica.
+**Motivation**: The previous approach sent a quaternion from the Control's camera, inverted it, and applied it to the Display's `moleculeGroup`. This caused drift because the group rotation and the camera are inverse transformations. Now the exact camera position and look-at point are sent, and the Display copies those values directly. The view is identical.
 
-### 7.4 WebSocket nativo vs Socket.IO
+### 7.4 Native WebSocket vs Socket.IO
 
-**Decisión**: WebSocket nativo con wrapper ligero (~120 líneas).
+**Decision**: Native WebSocket with a lightweight wrapper (~120 lines).
 
-**Motivación**: Socket.IO requiere su protocolo propio (long-polling como fallback) que no es necesario en Cloudflare Workers. El Durable Object maneja WebSocket nativo sin intermediarios.
+**Motivation**: Socket.IO requires its own protocol (long-polling as fallback) which is unnecessary in Cloudflare Workers. The Durable Object handles native WebSocket without intermediaries.
 
-### 7.5 Cursor oculto en Display
+### 7.5 Hidden Cursor on Display
 
-**Decisión**: `cursor: none` en la pantalla de exhibición.
+**Decision**: `cursor: none` on the exhibition screen.
 
-**Motivación**: En un museo, el cursor del mouse en una pantalla de proyector es antiestético y confunde a los visitantes.
+**Motivation**: In a museum, the mouse cursor on a projector screen is unaesthetic and confuses visitors.
 
-### 7.6 Multi-page Vite en lugar de SPA
+### 7.6 Multi-page Vite Instead of SPA
 
-**Decisión**: Vite multi-page con HTML plano + JS vanilla.
+**Decision**: Vite multi-page with plain HTML + vanilla JS.
 
-**Motivación**: Las 3 pantallas son independientes (no navegan entre sí). Sin framework, sin bundle innecesario. Cada página carga solo lo que necesita.
+**Motivation**: The 3 screens are independent (they do not navigate between each other). No framework, no unnecessary bundle. Each page loads only what it needs.
 
-### 7.7 Datos Demo Precargados
+### 7.7 Preloaded Demo Data
 
-**Decisión**: 3 moléculas demo incluidas en el código.
+**Decision**: 3 demo molecules included in the code.
 
-| Nombre | PDB ID | Átomos | Categoría |
+| Name | PDB ID | Atoms | Category |
 |--------|--------|--------|-----------|
-| Hemoglobina | 1A3N | ~4779 | Proteínas |
-| ADN (B-DNA) | 1BNA | ~486 | Ácidos Nucleicos |
-| tRNA | 1EHZ | ~1653 | Ácidos Nucleicos |
+| Hemoglobin | 1A3N | ~4779 | Proteins |
+| DNA (B-DNA) | 1BNA | ~486 | Nucleic Acids |
+| tRNA | 1EHZ | ~1653 | Nucleic Acids |
 
-**Flujo de carga demo**: Vite tiene URLs de RCSB PDB configuradas en su proxy de desarrollo, permitiendo desarrollo 100% offline sin backend.
+**Demo loading flow**: Vite has RCSB PDB URLs configured in its dev proxy, allowing 100% offline development without a backend.
 
 ---
 
-## 8. Roadmap / Fases
+## 8. Roadmap / Phases
 
-| Fase | Estado | Descripción |
+| Phase | Status | Description |
 |------|--------|-------------|
-| **Fase 1** Skeleton | ✅ Completa | Estructura del proyecto, Vite multi-page, HTML/CSS/JS base |
-| **Fase 2** Backend | ✅ Completa | Worker Hono + D1 + R2 + KV + Durable Object |
-| **Fase 3** Shared | ✅ Completa | ECS Core, Constants, MoleculeLoader, WebSocket Client |
-| **Fase 4** Display | ✅ Completa | Escena 3D esclava del Control, loading screen, overlay |
-| **Fase 5** Control | ✅ Completa | Lista de moléculas, preview 3D, controles de estilo y audio |
-| **Fase 6** Admin | ✅ Completa | CRUD de moléculas, upload de PDB/audio, Drag & Drop |
-| **Fase 7** Polish | 🔄 En progreso | ECS optimization, mejoras de rendering, tests |
+| **Phase 1** Skeleton | ✅ Complete | Project structure, Vite multi-page, base HTML/CSS/JS |
+| **Phase 2** Backend | ✅ Complete | Hono Worker + D1 + R2 + KV + Durable Object |
+| **Phase 3** Shared | ✅ Complete | ECS Core, Constants, MoleculeLoader, WebSocket Client |
+| **Phase 4** Display | ✅ Complete | 3D scene slave to Control, loading screen, overlay |
+| **Phase 5** Control | ✅ Complete | Molecule list, 3D preview, style and audio controls |
+| **Phase 6** Admin | ✅ Complete | Molecule CRUD, PDB/audio upload, Drag & Drop |
+| **Phase 7** Polish | 🔄 In progress | ECS optimization, rendering improvements, tests |
 
 ---
 
-## 9. Licencia
+## 9. License
 
-LPEd — Licencia Pública Educativa Aletheia.
+LPEd — Aletheia Public Educational License.
 
-**Uso libre** para museos, instituciones educativas, ferias científicas, entidades gubernamentales y organizaciones sin fines de lucro con fines educativos. El software no puede cobrarse como producto independiente, pero sí puede incluirse en exhibiciones que cobren entrada.
+**Free use** for museums, educational institutions, science fairs, government entities, and non-profit organizations for educational purposes. The software may not be sold as a standalone product, but may be included in exhibitions that charge admission.
 
-**Uso comercial** estrictamente reservado a **Mario José Melendez Vasquez** (titular), **Kahuna Agency** y terceros con licencia explícita.
+**Commercial use** strictly reserved to **Mario José Melendez Vasquez** (owner), **Kahuna Agency** and third parties with an explicit license.
 
-Ver el archivo [LICENSE.md](./LICENSE.md) para el texto completo.
+See the file [LICENSE.md](./LICENSE.md) for the full text.

@@ -1,15 +1,16 @@
 // ====================================================================
 // ====================================================================
-// {1} ECS MOLECULE MANAGER — ORQUESTADOR DEL PIPELINE ECS
+// {1} ECS MOLECULE MANAGER — ECS PIPELINE ORCHESTRATOR
 // ====================================================================
-// Interfaz unificada que coordina: ECS World → Parse → Color → Style → Render.
-// Este módulo reemplaza la lógica anterior de molecule-loader.js
-// como la capa de construcción de moléculas basada en ECS.
+// Unified interface that coordinates: ECS World → Parse → Color → Style → Render.
+// This module replaces the previous molecule-loader.js logic
+// as the ECS-based molecule construction layer.
 // ====================================================================
 
 import { ECSWorld, ComponentType } from './ecs-world.js';
 import { registerMoleculeComponents } from './molecule-components.js';
 import { PDBParseSystem, ColorSystem, StyleSystem, RenderSystem } from './molecule-systems.js';
+import * as THREE from 'three';
 
 export class ECSMoleculeManager {
   constructor() {
@@ -27,27 +28,33 @@ export class ECSMoleculeManager {
   }
 
   // ====================================================================
-  // {2} PIPELINE COMPLETO: PDB → ECS → THREE.JS
+  // {2} COMPLETE PIPELINE: PDB → ECS → THREE.JS
   // ====================================================================
   buildFromPDB(pdbText, style = 'ball-and-stick') {
     this.lastPDBText = pdbText;
 
-    // 1. Parse PDB → llena Position3D + ElementType + BondPairs
+    // 1. Parse PDB → fills Position3D + ElementType + BondPairs
     const parseResult = this.parser.execute(this.world, pdbText);
     this.entityRange = { start: parseResult.start, count: parseResult.count };
     this.bondData = parseResult.bondData;
 
-    // 2. Asignar colores CPK
+    if (parseResult.count === 0) {
+      console.warn('[ECS] No atoms parsed from PDB data');
+      return new THREE.Group();
+    }
+
+    // 2. Assign CPK colors
     this.colorSystem.execute(this.world, this.entityRange);
 
-    // 3. Asignar radios según estilo
+    // 3. Assign radii according to style
     this.styleSystem.setStyle(style);
     this.styleSystem.execute(this.world, this.entityRange);
 
     // 4. Render → InstancedMesh
     const moleculeGroup = this.renderSystem.execute(this.world, this.entityRange);
+    if (!moleculeGroup) return new THREE.Group();
 
-    // 5. Añadir enlaces si aplica
+    // 5. Add bonds if applicable
     const bondRadius = this.styleSystem.getBondRadius();
     const bondMesh = this.renderSystem.buildBonds(
       this.world, this.entityRange, this.bondData, bondRadius
@@ -60,15 +67,17 @@ export class ECSMoleculeManager {
   }
 
   // ====================================================================
-  // {3} CAMBIO DE ESTILO (SIN REPARSEAR PDB)
+  // {3} STYLE CHANGE (WITHOUT REPARSING PDB)
   // ====================================================================
   rebuildStyle(style) {
     if (!this.entityRange || !this.lastPDBText) return null;
+    if (this.entityRange.count === 0) return new THREE.Group();
 
     this.styleSystem.setStyle(style);
     this.styleSystem.execute(this.world, this.entityRange);
 
     const moleculeGroup = this.renderSystem.execute(this.world, this.entityRange);
+    if (!moleculeGroup) return new THREE.Group();
 
     const bondRadius = this.styleSystem.getBondRadius();
     const bondMesh = this.renderSystem.buildBonds(
@@ -82,7 +91,7 @@ export class ECSMoleculeManager {
   }
 
   // ====================================================================
-  // {4} ACCESO A DATOS CRUDOS (para depuración / serialización)
+  // {4} RAW DATA ACCESS (for debugging / serialization)
   // ====================================================================
   getRawPositions() {
     if (!this.entityRange) return null;
@@ -110,7 +119,7 @@ export class ECSMoleculeManager {
   }
 
   // ====================================================================
-  // {5} LIMPIEZA
+  // {5} CLEANUP
   // ====================================================================
   dispose() {
     this.renderSystem.dispose();

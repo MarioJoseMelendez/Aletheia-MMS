@@ -1,9 +1,9 @@
 /* ====================================================================
    ====================================================================
-   {1} DISPLAY — ESTILOS GLOBALES
+   {1} DISPLAY — GLOBAL STYLES
    ====================================================================
-   Fondo negro puro obligatorio. Oculta overflow para no tener barras 
-   de scroll en la pantalla de exhibición.
+   Pure black background mandatory. Hides overflow to avoid scrollbars
+   on the exhibition screen.
    ==================================================================== */
 
 :root {
@@ -20,17 +20,17 @@
 }
 
 body {
-  /* Fondo negro puro obligatorio (0x000000) */
+  /* Pure black background mandatory (0x000000) */
   background: #000000;
   overflow: hidden;
   font-family: 'Inter', sans-serif;
   color: var(--color-text);
-  /* Ocultar cursor en modo exhibición para que no estorbe */
+  /* Hide cursor in exhibition mode so it doesn't get in the way */
   cursor: none;
 }
 
 /* ====================================================================
-   {2} CANVAS CONTENEDOR
+   {2} CANVAS CONTAINER
    ==================================================================== */
 #canvas-container {
   position: absolute;
@@ -45,7 +45,7 @@ body {
    ====================================================================
    {3} LOADING SCREEN
    ====================================================================
-   Overlay centrado para la carga de PDBs. Totalmente modificable.
+   Centered overlay for PDB loading. Fully customizable.
    ==================================================================== */
 #loading-screen {
   position: absolute;
@@ -93,9 +93,9 @@ body {
 
 /* ====================================================================
    ====================================================================
-   {4} OVERLAY DE INFORMACIÓN (MOLÉCULA)
+   {4} INFORMATION OVERLAY (MOLECULE)
    ====================================================================
-   Aparece en una esquina cuando se selecciona una molécula.
+   Appears in a corner when a molecule is selected.
    ==================================================================== */
 #molecule-overlay {
   position: absolute;

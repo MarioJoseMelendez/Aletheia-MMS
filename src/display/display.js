@@ -1,10 +1,10 @@
 // ====================================================================
 // ====================================================================
-// {1} PANTALLA DE EXHIBICIÓN — ENTRY POINT
+// {1} DISPLAY SCREEN — ENTRY POINT
 // ====================================================================
-// Controlador principal de la vista 3D en pantalla completa.
-// Escucha eventos del WebSocket y reacciona actualizando la escena.
-// Carga automáticamente una molécula demo si no hay selección inicial.
+// Main controller for the fullscreen 3D view.
+// Listens to WebSocket events and reacts by updating the scene.
+// Automatically loads a demo molecule if no initial selection.
 // ====================================================================
 
 import { DisplayScene } from './scene.js';
@@ -13,7 +13,7 @@ import { wsClient } from '../shared/websocket-client.js';
 import { moleculeLoader } from '../shared/molecule-loader.js';
 import { WS_EVENTS, CONFIG, VISUALIZATION_STYLES } from '../shared/constants.js';
 
-// Molécula por defecto si se abre la pantalla de exhibición sola
+// Default molecule if the display screen is opened alone
 const DEFAULT_DEMO_MOLECULE = {
   id: 'hemoglobin-demo',
   name: 'Hemoglobina',
@@ -24,7 +24,7 @@ const DEFAULT_DEMO_MOLECULE = {
 };
 
 // ====================================================================
-// {2} ESTADO GLOBAL
+// {2} GLOBAL STATE
 // ====================================================================
 const state = {
   activeMoleculeId: null,
@@ -34,66 +34,66 @@ const state = {
 };
 
 // ====================================================================
-// {3} INICIALIZACIÓN
+// {3} INITIALIZATION
 // ====================================================================
 async function init() {
-  console.log('[Aletheia] Inicializando Display...');
+  console.log('[Aletheia] Initializing Display...');
   
-  // 1. Setup Escena 3D
+  // 1. Setup 3D Scene
   state.scene = new DisplayScene('canvas-container');
   
-  // 2. Iniciar loop de renderizado
+  // 2. Start render loop
   const animate = () => {
     requestAnimationFrame(animate);
     state.scene.renderer.render(state.scene.scene, state.scene.camera);
   };
   animate();
 
-  // 3. Suscribirse a eventos WebSocket
+  // 3. Subscribe to WebSocket events
   setupWebSocketListeners();
 
-  // 4. Cargar molécula inicial por defecto
+  // 4. Load initial default molecule
   await loadMolecule(DEFAULT_DEMO_MOLECULE);
 }
 
 // ====================================================================
-// {4} MANEJO DE WEBSOCKET
+// {4} WEBSOCKET HANDLING
 // ====================================================================
 function setupWebSocketListeners() {
   
-  // Cargar nueva molécula
+  // Load new molecule
   wsClient.on(WS_EVENTS.SELECT_MOLECULE, async (moleculeData) => {
     await loadMolecule(moleculeData);
   });
 
-  // Sincronización de cámara desde Control (posición + target)
+  // Camera synchronization from Control (position + target)
   wsClient.on(WS_EVENTS.CAMERA_UPDATE, (data) => {
     state.scene.setCamera(data.cameraPos, data.targetPos);
   });
 
-  // Resetear cámara
+  // Reset camera
   wsClient.on(WS_EVENTS.RESET_VIEW, () => {
     state.scene.resetView();
   });
 
-  // Cambiar estilo visual
+  // Change visual style
   wsClient.on(WS_EVENTS.STYLE_CHANGE, async (style) => {
     if (state.activeMoleculeId && state.currentStyle !== style) {
       state.currentStyle = style;
       const moleculeGroup = moleculeLoader.rebuildStyle(style);
       if (moleculeGroup) state.scene.setMolecule(moleculeGroup);
-      console.log(`[Display] Cambiando estilo a: ${style}`);
+      console.log(`[Display] Changing style to: ${style}`);
     }
   });
 
-  // Controles de Audio
+  // Audio Controls
   wsClient.on(WS_EVENTS.AUDIO_CONTROL, (action) => {
     handleAudioControl(action);
   });
 }
 
 // ====================================================================
-// {5} LÓGICA DE CARGA Y RENDERIZADO
+// {5} LOAD AND RENDER LOGIC
 // ====================================================================
 async function loadMolecule(moleculeData) {
   try {
@@ -101,15 +101,15 @@ async function loadMolecule(moleculeData) {
     loadingScreen.show();
     hideOverlay();
 
-    // 1. Cargar PDB desde la API/R2/Proxy
+    // 1. Load PDB from API/R2/Proxy
     const pdbUrl = `${CONFIG.API_BASE_URL}/files/${moleculeData.pdbFile}`;
     const pdbRawData = await moleculeLoader.loadPDB(pdbUrl);
 
-    // 2. Construir malla 3D (ECS pipeline: parse → color → style → render)
+    // 2. Build 3D mesh (ECS pipeline: parse → color → style → render)
     const moleculeGroup = moleculeLoader.buildMolecule(pdbRawData, state.currentStyle);
     state.scene.setMolecule(moleculeGroup);
 
-    // 3. Preparar Audio
+    // 3. Prepare Audio
     if (moleculeData.audioFile) {
       const audioUrl = `${CONFIG.API_BASE_URL}/files/${moleculeData.audioFile}`;
       state.audioElement.src = audioUrl;
@@ -117,26 +117,26 @@ async function loadMolecule(moleculeData) {
       handleAudioControl('play');
     }
 
-    // 4. Actualizar UI
+    // 4. Update UI
     updateOverlay(moleculeData.name, moleculeData.description);
     showOverlay();
 
   } catch (error) {
-    console.error('[Display] Error cargando molécula:', error);
+    console.error('[Display] Error loading molecule:', error);
   } finally {
     loadingScreen.hide();
   }
 }
 
 // ====================================================================
-// {6} LÓGICA DE AUDIO
+// {6} AUDIO LOGIC
 // ====================================================================
 function handleAudioControl(action) {
   if (!state.audioElement.src) return;
 
   switch (action) {
     case 'play':
-      state.audioElement.play().catch(e => console.warn('Autoplay bloqueado:', e));
+      state.audioElement.play().catch(e => console.warn('Autoplay blocked:', e));
       break;
     case 'pause':
       state.audioElement.pause();
@@ -149,7 +149,7 @@ function handleAudioControl(action) {
 }
 
 // ====================================================================
-// {7} LÓGICA DE OVERLAY UI
+// {7} OVERLAY UI LOGIC
 // ====================================================================
 function updateOverlay(name, description) {
   document.getElementById('molecule-name').textContent = name;

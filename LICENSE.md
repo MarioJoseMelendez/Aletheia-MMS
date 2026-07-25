@@ -1,35 +1,35 @@
-# Licencia Pública Educativa Aletheia (LPEd)
+# Aletheia Public Educational License (LPEd)
 
 **Copyright © 2025 Mario José Melendez Vasquez**
 
 ---
 
-## Uso Permitido (Sin necesidad de licencia explícita)
+## Permitted Use (Without need for explicit license)
 
-El software Aletheia puede ser usado, modificado y distribuido **sin costo alguno** por:
+The Aletheia software may be used, modified, and distributed **at no cost** by:
 
-- **Museos de ciencia, arte y cultura**
-- **Instituciones educativas** (escuelas, universidades, centros de investigación)
-- **Ferias científicas y exposiciones pedagógicas**
-- **Entidades gubernamentales** en funciones educativas o culturales
-- **Organizaciones sin fines de lucro** con fines educativos
+- **Science, art, and culture museums**
+- **Educational institutions** (schools, universities, research centers)
+- **Science fairs and pedagogical exhibitions**
+- **Governmental entities** in educational or cultural functions
+- **Nonprofit organizations** for educational purposes
 
-**Condición**: El software no puede ser cobrado como producto independiente. Las instituciones pueden cobrar por la *exhibición que incluye* el software (entrada al museo, feria, evento), pero no por el software en sí mismo.
+**Condition**: The software cannot be charged for as a standalone product. Institutions may charge for the *exhibition that includes* the software (museum entry, fair, event), but not for the software itself.
 
 ---
 
-## Uso Comercial (Requiere licencia explícita)
+## Commercial Use (Requires explicit license)
 
-El uso comercial de Aletheia está **estrictamente reservado** para:
+Commercial use of Aletheia is **strictly reserved** for:
 
-1. **Mario José Melendez Vasquez** — titular original de los derechos
-2. **Kahuna Agency** — agencia autorizada para distribución comercial
-3. **Terceros con licencia escrita explícita** otorgada por Mario José Melendez Vasquez
+1. **Mario José Melendez Vasquez** — original rights holder
+2. **Kahuna Agency** — authorized agency for commercial distribution
+3. **Third parties with explicit written license** granted by Mario José Melendez Vasquez
 
-Se considera **uso comercial** cualquier escenario donde:
-- Se cobre directamente por el acceso al software
-- Se integre en un producto de software cerrado con fines de lucro
-- Se utilice como componente de un servicio SaaS comercial
+**Commercial use** is considered any scenario where:
+- Direct payment is charged for access to the software
+- It is integrated into a closed-source software product for profit
+- It is used as a component of a commercial SaaS service
 
 ---
 

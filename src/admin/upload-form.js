@@ -1,9 +1,9 @@
 // ====================================================================
 // ====================================================================
-// {1} COMPONENTE: FORMULARIO DE UPLOAD (ADMIN)
+// {1} COMPONENT: UPLOAD FORM (ADMIN)
 // ====================================================================
-// Gestiona la zona de Drag & Drop para archivos .pdb y de audio,
-// y envía el multipart/form-data al Cloudflare Worker API.
+// Manages the Drag & Drop zone for .pdb and audio files,
+// and sends the multipart/form-data to the Cloudflare Worker API.
 // ====================================================================
 
 import { CONFIG } from '../shared/constants.js';
@@ -15,7 +15,7 @@ export class UploadForm {
     this.addBtn = document.getElementById('add-molecule-btn');
     this.cancelBtn = document.getElementById('cancel-btn');
     
-    // Dropzones e inputs
+    // Dropzones and inputs
     this.pdbDropzone = document.getElementById('pdb-dropzone');
     this.pdbInput = document.getElementById('mol-pdb');
     this.pdbFilenameLabel = document.getElementById('pdb-filename');
@@ -33,20 +33,20 @@ export class UploadForm {
   }
 
   // ====================================================================
-  // {2} EVENT LISTENERS Y DRAG & DROP
+  // {2} EVENT LISTENERS AND DRAG & DROP
   // ====================================================================
   setupEventListeners() {
-    // Abrir/Cerrar Modal
+    // Open/Close Modal
     this.addBtn.addEventListener('click', () => this.openModal());
     this.cancelBtn.addEventListener('click', () => this.closeModal());
 
-    // Submit del Formulario
+    // Submit Form
     this.form.addEventListener('submit', (e) => this.handleSubmit(e));
 
-    // Drag & Drop para PDB
+    // Drag & Drop for PDB
     this.setupDropzone(this.pdbDropzone, this.pdbInput, this.pdbFilenameLabel, ['.pdb']);
     
-    // Drag & Drop para Audio
+    // Drag & Drop for Audio
     this.setupDropzone(this.audioDropzone, this.audioInput, this.audioFilenameLabel, ['audio/']);
   }
 
@@ -76,7 +76,7 @@ export class UploadForm {
 
   updateFileLabel(input, label) {
     if (input.files.length) {
-      label.textContent = `Archivo seleccionado: ${input.files[0].name}`;
+      label.textContent = `Selected file: ${input.files[0].name}`;
     } else {
       label.textContent = '';
     }
@@ -98,7 +98,7 @@ export class UploadForm {
   }
 
   // ====================================================================
-  // {4} SUBMIT Y ENVÍO A WORKER (R2/KV)
+  // {4} SUBMIT AND SEND TO WORKER (R2/KV)
   // ====================================================================
   async handleSubmit(e) {
     e.preventDefault();
@@ -111,7 +111,7 @@ export class UploadForm {
     const audioFile = this.audioInput.files[0];
 
     if (!pdbFile) {
-      alert('Por favor selecciona un archivo .pdb obligatorio.');
+      alert('Please select a required .pdb file.');
       return;
     }
 
@@ -125,7 +125,7 @@ export class UploadForm {
     }
 
     try {
-      this.showProgress('Subiendo archivos a Cloudflare R2...');
+      this.showProgress('Uploading files to Cloudflare R2...');
 
       const response = await fetch(`${CONFIG.API_BASE_URL}/molecules`, {
         method: 'POST',
@@ -134,7 +134,7 @@ export class UploadForm {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(errorText || 'Error en la subida');
+        throw new Error(errorText || 'Upload error');
       }
 
       const result = await response.json();
@@ -143,8 +143,8 @@ export class UploadForm {
         this.onSuccessCallback(result);
       }
     } catch (err) {
-      console.error('[UploadForm] Error enviando formulario:', err);
-      alert(`Error al subir la molécula: ${err.message}`);
+      console.error('[UploadForm] Error submitting form:', err);
+      alert(`Error uploading molecule: ${err.message}`);
     } finally {
       this.hideProgress();
     }

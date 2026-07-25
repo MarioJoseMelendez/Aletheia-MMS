@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Aletheia — Admin</title>
-  <meta name="description" content="Aletheia: Panel de administración para macromoléculas" />
+  <meta name="description" content="Aletheia: Administration panel for macromolecules" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <script type="module" crossorigin src="/assets/admin-BGDTHX0M.js"></script>
+  <script type="module" crossorigin src="/assets/admin-Cst9WSuu.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/constants-DQPtr3nP.js">
   <link rel="stylesheet" crossorigin href="/assets/admin-bUXsHJe_.css">
 </head>
@@ -19,82 +19,82 @@
        {1} HEADER
        ================================================================== -->
   <header id="admin-header">
-    <h1>Aletheia — Administración</h1>
-    <p>Gestión de macromoléculas</p>
+    <h1>Aletheia — Administration</h1>
+    <p>Macromolecule management</p>
   </header>
 
   <!-- ==================================================================
        ==================================================================
-       {2} CONTENIDO PRINCIPAL
+        {2} MAIN CONTENT
        ================================================================== -->
   <main id="admin-main">
 
-    <!-- {3} Botón para agregar nueva molécula -->
+    <!-- {3} Button to add new molecule -->
     <div class="toolbar">
-      <button id="add-molecule-btn" class="primary-btn">+ Nueva Molécula</button>
+      <button id="add-molecule-btn" class="primary-btn">+ New Molecule</button>
     </div>
 
-    <!-- {4} Tabla de moléculas -->
+    <!-- {4} Molecules table -->
     <div class="table-container">
       <table id="molecules-table">
         <thead>
           <tr>
-            <th>Nombre</th>
-            <th>Categoría</th>
-            <th>Átomos</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Atoms</th>
             <th>Audio</th>
-            <th>Fecha</th>
-            <th>Acciones</th>
+            <th>Date</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody id="molecules-tbody"></tbody>
       </table>
     </div>
 
-    <!-- {5} Modal de creación/edición -->
+    <!-- {5} Create/Edit modal -->
     <div id="molecule-modal" class="modal hidden">
       <div class="modal-backdrop"></div>
       <div class="modal-content">
-        <h2 id="modal-title">Nueva Molécula</h2>
+        <h2 id="modal-title">New Molecule</h2>
         <form id="molecule-form">
           <div class="form-group">
-            <label for="mol-name">Nombre</label>
+            <label for="mol-name">Name</label>
             <input type="text" id="mol-name" required />
           </div>
           <div class="form-group">
-            <label for="mol-description">Descripción</label>
+            <label for="mol-description">Description</label>
             <textarea id="mol-description" rows="3"></textarea>
           </div>
           <div class="form-group">
-            <label for="mol-category">Categoría</label>
-            <input type="text" id="mol-category" placeholder="Ej: Proteínas, ADN, Lípidos" />
+            <label for="mol-category">Category</label>
+            <input type="text" id="mol-category" placeholder="E.g.: Proteins, DNA, Lipids" />
           </div>
           <div class="form-group">
-            <label>Archivo PDB</label>
+            <label>PDB File</label>
             <div id="pdb-dropzone" class="dropzone">
-              <p>Arrastra tu archivo .pdb aquí o haz click para seleccionar</p>
+              <p>Drop your .pdb file here or click to select</p>
               <input type="file" id="mol-pdb" accept=".pdb" />
             </div>
             <p id="pdb-filename" class="file-indicator"></p>
           </div>
           <div class="form-group">
-            <label>Archivo de Audio</label>
+            <label>Audio File</label>
             <div id="audio-dropzone" class="dropzone">
-              <p>Arrastra tu archivo de audio aquí o haz click para seleccionar</p>
+              <p>Drop your audio file here or click to select</p>
               <input type="file" id="mol-audio" accept="audio/*" />
             </div>
             <p id="audio-filename" class="file-indicator"></p>
           </div>
           <div class="form-actions">
-            <button type="button" id="cancel-btn" class="secondary-btn">Cancelar</button>
-            <button type="submit" id="save-btn" class="primary-btn">Guardar</button>
+            <button type="button" id="cancel-btn" class="secondary-btn">Cancel</button>
+            <button type="submit" id="save-btn" class="primary-btn">Save</button>
           </div>
         </form>
         <div id="upload-progress" class="hidden">
           <div class="progress-bar">
             <div id="upload-progress-fill" class="progress-fill"></div>
           </div>
-          <p id="upload-status">Subiendo archivos…</p>
+          <p id="upload-status">Uploading files…</p>
         </div>
       </div>
     </div>

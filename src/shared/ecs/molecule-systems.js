@@ -1,9 +1,9 @@
 // ====================================================================
 // ====================================================================
-// {1} SISTEMAS MOLECULARES — PIPELINE ECS
+// {1} MOLECULAR SYSTEMS — ECS PIPELINE
 // ====================================================================
-// Sistemas que procesan los datos crudos del ECS World para
-// transformarlos en geometría renderizable con Three.js.
+// Systems that process raw ECS World data to
+// transform it into renderable geometry with Three.js.
 // ====================================================================
 
 import * as THREE from 'three';
@@ -13,7 +13,7 @@ import { getCPKColor, getRadius, symbolToElement } from './molecule-components.j
 // ====================================================================
 // {2} PDB PARSE SYSTEM
 // ====================================================================
-// Toma texto PDB crudo y llena Position3D + ElementType + BondPairs.
+// Takes raw PDB text and fills Position3D + ElementType + BondPairs.
 // ====================================================================
 export class PDBParseSystem {
   constructor() {
@@ -82,7 +82,7 @@ export class PDBParseSystem {
 // ====================================================================
 // {3} COLOR SYSTEM
 // ====================================================================
-// Llena VisualColor según ElementType usando la tabla CPK.
+// Fills VisualColor according to ElementType using the CPK table.
 // ====================================================================
 export class ColorSystem {
   execute(world, entityRange) {
@@ -108,7 +108,7 @@ export class ColorSystem {
 // ====================================================================
 // {4} STYLE SYSTEM
 // ====================================================================
-// Calcula VisualRadius según ElementType y el estilo activo.
+// Calculates VisualRadius according to ElementType and the active style.
 // ====================================================================
 export class StyleSystem {
   constructor(initialStyle = 'ball-and-stick') {
@@ -146,8 +146,8 @@ export class StyleSystem {
 // ====================================================================
 // {5} RENDER SYSTEM
 // ====================================================================
-// Construye InstancedMesh de Three.js a partir de los datos ECS.
-// Reusa geometrías base (icosaedro para átomos, cilindro para enlaces).
+// Builds Three.js InstancedMesh from ECS data.
+// Reuses base geometries (icosahedron for atoms, cylinder for bonds).
 // ====================================================================
 export class RenderSystem {
   constructor() {
@@ -225,7 +225,7 @@ export class RenderSystem {
   }
 
   /**
-   * Construye enlaces por separado (se llama con BondPairs).
+   * Builds bonds separately (called with BondPairs).
    */
   buildBonds(world, entityRange, bondData, bondRadius) {
     const { start, count } = entityRange;

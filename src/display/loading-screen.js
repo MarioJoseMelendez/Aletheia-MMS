@@ -1,10 +1,10 @@
 // ====================================================================
 // ====================================================================
-// {1} PANTALLA DE CARGA (LOADING SCREEN)
+// {1} LOADING SCREEN
 // ====================================================================
-// Controlador sencillo para mostrar/ocultar el overlay de carga.
-// La estructura visual está definida puramente en HTML/CSS para que 
-// el usuario pueda personalizarla sin tocar JavaScript.
+// Simple controller to show/hide the loading overlay.
+// The visual structure is defined purely in HTML/CSS so that
+// the user can customize it without touching JavaScript.
 // ====================================================================
 
 export const loadingScreen = {

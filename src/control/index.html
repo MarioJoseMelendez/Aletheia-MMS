@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Aletheia — Control</title>
-  <meta name="description" content="Aletheia: Panel de control para simulador de macromoléculas" />
+  <meta name="description" content="Aletheia: Control panel for macromolecule simulator" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -14,26 +14,26 @@
 
   <!-- ==================================================================
        ==================================================================
-       {1} LAYOUT PRINCIPAL
+        {1} MAIN LAYOUT
        ==================================================================
-       Grid de dos columnas: sidebar izquierdo + área principal derecha.
+        Two-column grid: left sidebar + right main area.
        ================================================================== -->
   <div id="app-layout">
 
     <!-- ==================================================================
-         {2} SIDEBAR — LISTA DE MOLÉCULAS
+         {2} SIDEBAR — MOLECULE LIST
          ================================================================== -->
     <aside id="sidebar">
       <div class="sidebar-header">
         <h1 class="app-title">Aletheia</h1>
-        <p class="app-subtitle">Simulador de Macromoléculas</p>
+        <p class="app-subtitle">Macromolecule Simulator</p>
       </div>
 
       <div class="search-container">
         <input
           type="text"
           id="molecule-search"
-          placeholder="Buscar molécula…"
+          placeholder="Search molecule…"
           autocomplete="off"
         />
       </div>
@@ -42,31 +42,31 @@
     </aside>
 
     <!-- ==================================================================
-         {3} ÁREA PRINCIPAL
+         {3} MAIN AREA
          ================================================================== -->
     <main id="main-area">
 
-      <!-- {4} Vista previa 3D -->
+      <!-- {4} 3D Preview -->
       <section id="preview-section">
-        <h2 class="section-title">Vista Previa</h2>
+        <h2 class="section-title">Preview</h2>
         <div id="preview-container"></div>
       </section>
 
-      <!-- {5} Controles de visualización -->
+      <!-- {5} Visualization controls -->
       <section id="controls-section">
-        <h2 class="section-title">Visualización</h2>
+        <h2 class="section-title">Visualization</h2>
         <div id="style-buttons">
           <button class="style-btn active" data-style="ball-and-stick">Ball &amp; Stick</button>
           <button class="style-btn" data-style="spheres">Esferas</button>
           <button class="style-btn" data-style="sticks">Sticks</button>
         </div>
-        <button id="reset-view-btn" class="action-btn">Resetear Vista</button>
+        <button id="reset-view-btn" class="action-btn">Reset View</button>
       </section>
 
-      <!-- {6} Controles de audio -->
+      <!-- {6} Audio controls -->
       <section id="audio-section">
         <h2 class="section-title">Audio</h2>
-        <p id="audio-track-name">Sin audio seleccionado</p>
+        <p id="audio-track-name">No audio selected</p>
         <div id="audio-controls">
           <button id="audio-play-btn" class="audio-btn" disabled>▶</button>
           <button id="audio-pause-btn" class="audio-btn" disabled>⏸</button>
