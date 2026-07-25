@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aletheia — Portal Principal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0f;
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 3rem;
+      color: #00d4aa;
+      margin-bottom: 10px;
+      letter-spacing: 2px;
+    }
+    p {
+      color: #a0a0a0;
+      margin-bottom: 40px;
+      font-size: 1.1rem;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      max-width: 900px;
+      width: 100%;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 30px;
+      text-decoration: none;
+      color: #fff;
+      transition: transform 0.2s, border-color 0.2s, background 0.2s;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: #00d4aa;
+      background: rgba(0, 212, 170, 0.05);
+    }
+    .card-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #00d4aa;
+    }
+    .card-desc {
+      color: #808080;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.1);
+      align-self: flex-start;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>ALETHEIA</h1>
+  <p>Simulador de Macromoléculas Biológicas en 3D</p>
+
+  <div class="cards">
+    <a href="/src/display/" class="card">
+      <span class="badge">Pantalla 1</span>
+      <div class="card-title">📺 Exhibición</div>
+      <div class="card-desc">Visualización 3D en pantalla completa con fondo negro puro y auto-rotación.</div>
+    </a>
+
+    <a href="/src/control/" class="card">
+      <span class="badge">Pantalla 2</span>
+      <div class="card-title">🎮 Control</div>
+      <div class="card-desc">Panel interactivo para rotar, cambiar estilo visual y controlar el audio en tiempo real.</div>
+    </a>
+
+    <a href="/src/admin/" class="card">
+      <span class="badge">Administración</span>
+      <div class="card-title">🔧 Admin</div>
+      <div class="card-desc">Gestión de moléculas, carga de archivos .pdb y audios mediante Drag &amp; Drop.</div>
+    </a>
+  </div>
+
+</body>
+</html>

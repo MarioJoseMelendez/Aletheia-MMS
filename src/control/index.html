@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aletheia — Control</title>
+  <meta name="description" content="Aletheia: Panel de control para simulador de macromoléculas" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./control.css" />
+</head>
+<body>
+
+  <!-- ==================================================================
+       ==================================================================
+       {1} LAYOUT PRINCIPAL
+       ==================================================================
+       Grid de dos columnas: sidebar izquierdo + área principal derecha.
+       ================================================================== -->
+  <div id="app-layout">
+
+    <!-- ==================================================================
+         {2} SIDEBAR — LISTA DE MOLÉCULAS
+         ================================================================== -->
+    <aside id="sidebar">
+      <div class="sidebar-header">
+        <h1 class="app-title">Aletheia</h1>
+        <p class="app-subtitle">Simulador de Macromoléculas</p>
+      </div>
+
+      <div class="search-container">
+        <input
+          type="text"
+          id="molecule-search"
+          placeholder="Buscar molécula…"
+          autocomplete="off"
+        />
+      </div>
+
+      <ul id="molecule-list"></ul>
+    </aside>
+
+    <!-- ==================================================================
+         {3} ÁREA PRINCIPAL
+         ================================================================== -->
+    <main id="main-area">
+
+      <!-- {4} Vista previa 3D -->
+      <section id="preview-section">
+        <h2 class="section-title">Vista Previa</h2>
+        <div id="preview-container"></div>
+      </section>
+
+      <!-- {5} Controles de visualización -->
+      <section id="controls-section">
+        <h2 class="section-title">Visualización</h2>
+        <div id="style-buttons">
+          <button class="style-btn active" data-style="ball-and-stick">Ball &amp; Stick</button>
+          <button class="style-btn" data-style="spheres">Esferas</button>
+          <button class="style-btn" data-style="sticks">Sticks</button>
+        </div>
+        <button id="reset-view-btn" class="action-btn">Resetear Vista</button>
+      </section>
+
+      <!-- {6} Controles de audio -->
+      <section id="audio-section">
+        <h2 class="section-title">Audio</h2>
+        <p id="audio-track-name">Sin audio seleccionado</p>
+        <div id="audio-controls">
+          <button id="audio-play-btn" class="audio-btn" disabled>▶</button>
+          <button id="audio-pause-btn" class="audio-btn" disabled>⏸</button>
+          <button id="audio-stop-btn" class="audio-btn" disabled>⏹</button>
+        </div>
+        <div id="audio-progress">
+          <div id="audio-progress-fill"></div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script type="module" src="./control.js"></script>
+
+</body>
+</html>

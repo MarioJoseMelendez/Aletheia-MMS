@@ -1,0 +1,25 @@
+name = "aletheia-backend"
+main = "worker/src/index.js"
+compatibility_date = "2024-07-20"
+
+[[kv_namespaces]]
+binding = "ALETHEIA_KV"
+id = "aletheia_kv"
+
+[[r2_buckets]]
+binding = "ALETHEIA_STORAGE"
+bucket_name = "aletheia-storage"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "aletheia-db"
+database_id = "local-d1-id"
+
+[durable_objects]
+bindings = [
+  { name = "SYNC_ROOM", class_name = "SyncRoom" }
+]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["SyncRoom"]
