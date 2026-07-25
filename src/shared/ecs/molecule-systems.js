@@ -9,7 +9,7 @@
 import * as THREE from 'three';
 import { PDBLoader } from 'three/examples/jsm/loaders/PDBLoader.js';
 import { ComponentType } from './ecs-world.js';
-import { getCPKColor, getRadius, symbolToElement, ElementSymbol } from './molecule-components.js';
+import { getCPKColor, getRadius, symbolToElement, ElementSymbol, Element } from './molecule-components.js';
 
 // ====================================================================
 // {2} PDB PARSE SYSTEM
@@ -28,8 +28,9 @@ export class PDBParseSystem {
   execute(world, pdbText) {
     const lines = pdbText.split('\n');
     const atoms = [];
+    const waterOIndices = [];
 
-    // 1. Parse atoms with custom text parser (keeps ECS data clean)
+    // 1. Parse atoms with custom text parser
     for (const line of lines) {
       if (line.startsWith('ATOM') || line.startsWith('HETATM')) {
         const x = parseFloat(line.substring(30, 38));
@@ -37,18 +38,67 @@ export class PDBParseSystem {
         const z = parseFloat(line.substring(46, 54));
         const elementSymbol = line.substring(76, 78).trim() || line.substring(12, 14).trim();
         const element = symbolToElement(elementSymbol);
+        const resName = line.substring(17, 20).trim();
 
         atoms.push({ x, y, z, element, elementStr: elementSymbol });
+
+        if (resName === 'HOH' && elementSymbol === 'O') {
+          waterOIndices.push(atoms.length - 1);
+        }
       }
     }
 
-    const count = atoms.length;
+    // 2. Generate artificial hydrogen atoms for water molecules
+    const O_H_DIST = 0.96;
+    const HOH_ANGLE = 104.5 * Math.PI / 180;
+    const halfAngle = HOH_ANGLE / 2;
+    const generatedHAtoms = [];
+    const ohBonds = [];
+
+    for (const oIdx of waterOIndices) {
+      const ox = atoms[oIdx].x;
+      const oy = atoms[oIdx].y;
+      const oz = atoms[oIdx].z;
+
+      const theta = Math.random() * 2 * Math.PI;
+      const phi = Math.acos(2 * Math.random() - 1);
+      const cosT = Math.cos(theta), sinT = Math.sin(theta);
+      const cosP = Math.cos(phi), sinP = Math.sin(phi);
+
+      const rotate = (lx, ly, lz) => {
+        let rx = lx * cosT + lz * sinT;
+        let ry = ly;
+        let rz = -lx * sinT + lz * cosT;
+        let fy = ry * cosP - rz * sinP;
+        let fz = ry * sinP + rz * cosP;
+        return { x: rx + ox, y: fy + oy, z: fz + oz };
+      };
+
+      const sh = Math.sin(halfAngle);
+      const ch = Math.cos(halfAngle);
+
+      const h1 = rotate(-sh * O_H_DIST, 0, ch * O_H_DIST);
+      const h2 = rotate(sh * O_H_DIST, 0, ch * O_H_DIST);
+
+      const hIdx1 = atoms.length + generatedHAtoms.length;
+      const hIdx2 = hIdx1 + 1;
+
+      generatedHAtoms.push(
+        { x: h1.x, y: h1.y, z: h1.z, element: Element.H, elementStr: 'H' },
+        { x: h2.x, y: h2.y, z: h2.z, element: Element.H, elementStr: 'H' }
+      );
+
+      ohBonds.push([oIdx, hIdx1], [oIdx, hIdx2]);
+    }
+
+    const allAtoms = atoms.concat(generatedHAtoms);
+    const count = allAtoms.length;
     const { start } = world.createEntities(count);
     const posData = new Float32Array(count * 3);
     const elemData = new Uint8Array(count);
 
     for (let i = 0; i < count; i++) {
-      const atom = atoms[i];
+      const atom = allAtoms[i];
       posData[i * 3]     = atom.x;
       posData[i * 3 + 1] = atom.y;
       posData[i * 3 + 2] = atom.z;
@@ -59,8 +109,12 @@ export class PDBParseSystem {
     world.setComponentData(ComponentType.ELEMENT_TYPE, start, elemData);
     world.setComponentData(ComponentType.ACTIVE_FLAG, start, new Uint8Array(count).fill(1));
 
-    // 2. Generate bond pairs using Three.js PDBLoader bond detection
+    // 3. Detect bonds among original atoms, then add O-H bonds
     const bonds = this._detectBonds(pdbText, atoms);
+    for (const bond of ohBonds) {
+      bonds.push(bond);
+    }
+
     const bondData = new Uint16Array(bonds.length * 2);
     for (let i = 0; i < bonds.length; i++) {
       bondData[i * 2]     = bonds[i][0];
