@@ -1,35 +1,20 @@
-# Aletheia Public Educational License (LPEd)
+# Aletheia Public License (APL)
 
 **Copyright © 2025 Mario José Melendez Vasquez**
 
----
-
-## Permitted Use (Without need for explicit license)
-
-The Aletheia software may be used, modified, and distributed **at no cost** by:
-
-- **Science, art, and culture museums**
-- **Educational institutions** (schools, universities, research centers)
-- **Science fairs and pedagogical exhibitions**
-- **Governmental entities** in educational or cultural functions
-- **Nonprofit organizations** for educational purposes
-
-**Condition**: The software cannot be charged for as a standalone product. Institutions may charge for the *exhibition that includes* the software (museum entry, fair, event), but not for the software itself.
+_Created by **Kahuna Labs**, a division of **Kahuna Agency**_
 
 ---
 
-## Commercial Use (Requires explicit license)
+## Terms
 
-Commercial use of Aletheia is **strictly reserved** for:
+1. **Free use**: This software may be used, copied, modified, and distributed for any purpose — educational, scientific, cultural, commercial, or otherwise — wherever it may be useful.
 
-1. **Mario José Melendez Vasquez** — original rights holder
-2. **Kahuna Agency** — authorized agency for commercial distribution
-3. **Third parties with explicit written license** granted by Mario José Melendez Vasquez
+2. **No redistribution under another name**: You may distribute modified versions, but you may not redistribute the original or substantially unmodified software under a different name.
 
-**Commercial use** is considered any scenario where:
-- Direct payment is charged for access to the software
-- It is integrated into a closed-source software product for profit
-- It is used as a component of a commercial SaaS service
+3. **Attribution required**: All public use — including exhibitions, science fairs, research publications, websites, or any material where this software or its derivatives are presented — must visibly credit **Mario José Melendez Vasquez** and link to the original repository.
+
+4. **Modifications**: Modified versions (derivative works) must also carry attribution to the original author and repository.
 
 ---
 
