@@ -16,9 +16,9 @@ import { WS_EVENTS, CONFIG, VISUALIZATION_STYLES } from '../shared/constants.js'
 // Default molecule if the display screen is opened alone
 const DEFAULT_DEMO_MOLECULE = {
   id: 'hemoglobin-demo',
-  name: 'Hemoglobina',
-  description: 'Proteína tetramérica encargada del transporte de oxígeno en los glóbulos rojos.',
-  category: 'Proteínas',
+  name: 'Hemoglobin',
+  description: 'Tetrameric protein responsible for oxygen transport in red blood cells.',
+  category: 'Proteins',
   pdbFile: 'demo_1A3N.pdb',
   audioFile: null
 };

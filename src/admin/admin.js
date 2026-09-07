@@ -54,7 +54,7 @@ class AdminPanel {
 
     molecules.forEach(mol => {
       const tr = document.createElement('tr');
-      const dateStr = mol.createdAt ? new Date(mol.createdAt).toLocaleDateString('es-ES') : '-';
+      const dateStr = mol.createdAt ? new Date(mol.createdAt).toLocaleDateString('en-US') : '-';
       
       tr.innerHTML = `
         <td><strong>${mol.name}</strong></td>

@@ -46,7 +46,7 @@ export class ControlsPanel {
 
     this.scene.add(this.moleculeGroup);
 
-    // Luces
+    // Lights
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     this.scene.add(ambientLight);
     const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);

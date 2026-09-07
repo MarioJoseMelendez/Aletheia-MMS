@@ -47,8 +47,8 @@ class AutoRotateManager {
   // {3} ANIMATION LOOP
   // ====================================================================
   /**
-   * Debe ser llamado dentro del requestAnimationFrame principal
-   * @param {DisplayScene} scene Instancia de la escena principal
+   * Must be called inside the main requestAnimationFrame loop
+   * @param {DisplayScene} scene Main scene instance
    */
   update(scene) {
     if (this.isIdle) {

@@ -19,7 +19,7 @@ class MoleculeLoader {
   // ====================================================================
   async loadPDB(url) {
     const response = await fetch(url);
-    if (!response.ok) throw new Error(`Error cargando PDB: ${response.status} ${response.statusText}`);
+    if (!response.ok) throw new Error(`Error loading PDB: ${response.status} ${response.statusText}`);
     const text = await response.text();
     return text;
   }

@@ -42,7 +42,7 @@ export class ECSWorld {
   createEntity() {
     const id = this.nextEntityId++;
     if (id >= MAX_ENTITIES) {
-      throw new Error(`ECSWorld: excedido límite de ${MAX_ENTITIES} entidades`);
+      throw new Error(`ECSWorld: exceeded limit of ${MAX_ENTITIES} entities`);
     }
     return id;
   }
@@ -67,10 +67,10 @@ export class ECSWorld {
   // {6} COMPONENT POOL MANAGEMENT
   // ====================================================================
   /**
-   * Registra un componente con typed array pre-asignado.
-   * @param {number} typeId  - ID del tipo de componente (de ComponentType)
+   * Registers a component with a pre-allocated typed array.
+   * @param {number} typeId  - Component type ID (from ComponentType)
    * @param {TypedArray} typedArrayCtor  - Constructor Float32Array, Uint8Array, etc.
-   * @param {number} stride  - Elementos por entidad (1, 3, etc.)
+   * @param {number} stride  - Elements per entity (1, 3, etc.)
    */
   registerComponent(typeId, typedArrayCtor, stride = 1) {
     const pool = new typedArrayCtor(MAX_ENTITIES * stride);
@@ -78,10 +78,10 @@ export class ECSWorld {
   }
 
   /**
-   * Escribe datos en el pool para un rango de entidades.
+   * Writes data to the pool for a range of entities.
    * @param {number} typeId
    * @param {number} entityStart
-   * @param {Array|TypedArray} data  - Datos planos
+   * @param {Array|TypedArray} data  - Flat data
    */
   setComponentData(typeId, entityStart, data) {
     const comp = this.components.get(typeId);
@@ -92,7 +92,7 @@ export class ECSWorld {
   }
 
   /**
-   * Lee el pool directamente (para sistemas).
+   * Reads the pool directly (for systems).
    * @param {number} typeId
    * @returns {{ pool: TypedArray, stride: number }}
    */
@@ -103,20 +103,20 @@ export class ECSWorld {
   }
 
   /**
-   * Lee datos de una entidad específica.
+   * Reads data for a specific entity.
    * @param {number} typeId
    * @param {number} entityId
-   * @returns {Array} valores planos
+   * @returns {Array} flat values
    */
   getEntityComponent(typeId, entityId) {
     const comp = this.components.get(typeId);
-    if (!comp) throw new Error(`Component type ${typeId} no registrado`);
+    if (!comp) throw new Error(`Component type ${typeId} not registered`);
     const offset = entityId * comp.stride;
     return Array.from(comp.pool.subarray(offset, offset + comp.stride));
   }
 
   /**
-   * Marca un componente como limpio (post-procesamiento).
+   * Marks a component as clean (post-processing).
    */
   markClean(typeId) {
     const comp = this.components.get(typeId);

@@ -20,9 +20,9 @@ const __dirname = resolve(__filename, '..');
 const DEMO_MOLECULES = [
   {
     id: 'hemoglobin-demo',
-    name: 'Hemoglobina',
-    description: 'Proteína tetramérica encargada del transporte de oxígeno en los glóbulos rojos.',
-    category: 'Proteínas',
+    name: 'Hemoglobin',
+    description: 'Tetrameric protein responsible for oxygen transport in red blood cells.',
+    category: 'Proteins',
     pdbFile: 'demo_1A3N.pdb',
     audioFile: null,
     createdAt: new Date().toISOString(),
@@ -30,9 +30,9 @@ const DEMO_MOLECULES = [
   },
   {
     id: 'dna-demo',
-    name: 'ADN (Doble Hélice B-DNA)',
-    description: 'Estructura de doble hélice de ácido desoxirribonucleico conteniendo la información genética.',
-    category: 'Ácidos Nucleicos',
+    name: 'DNA (B-DNA Double Helix)',
+    description: 'Double helix structure of deoxyribonucleic acid containing genetic information.',
+    category: 'Nucleic Acids',
     pdbFile: 'demo_1BNA.pdb',
     audioFile: null,
     createdAt: new Date().toISOString(),
@@ -40,9 +40,9 @@ const DEMO_MOLECULES = [
   },
   {
     id: 'rna-demo',
-    name: 'ARN de Transferencia (tRNA)',
-    description: 'Molécula de ARN encargada de transferir aminoácidos al ribosoma durante la traducción.',
-    category: 'Ácidos Nucleicos',
+    name: 'Transfer RNA (tRNA)',
+    description: 'RNA molecule responsible for transferring amino acids to the ribosome during translation.',
+    category: 'Nucleic Acids',
     pdbFile: 'demo_1EHZ.pdb',
     audioFile: null,
     createdAt: new Date().toISOString(),

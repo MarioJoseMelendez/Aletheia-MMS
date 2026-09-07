@@ -64,7 +64,7 @@ export class DisplayScene {
   // ====================================================================
   
   /**
-   * Reemplaza la molécula actual por una nueva
+   * Replaces the current molecule with a new one
    * @param {THREE.Group} newMoleculeGroup
    */
   setMolecule(newMoleculeGroup) {
@@ -77,7 +77,7 @@ export class DisplayScene {
   }
 
   /**
-   * Posiciona la cámara exactamente como la del Control
+   * Positions the camera exactly like the Control camera
    * @param {Array} cameraPos [x, y, z]
    * @param {Array} targetPos [x, y, z]
    */
@@ -87,7 +87,7 @@ export class DisplayScene {
   }
 
   /**
-   * Restablece la vista a la posición por defecto
+   * Resets the view to the default position
    */
   resetView() {
     this.moleculeGroup.position.set(0, 0, 0);
