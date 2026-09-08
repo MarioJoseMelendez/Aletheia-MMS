@@ -31,7 +31,10 @@ export const VISUALIZATION_STYLES = {
 // {4} GENERAL CONFIGURATION
 // ====================================================================
 export const CONFIG = {
+  // Always '/api' — Vite proxies to http://localhost:8787 in dev (vite.config.js:123)
+  // and Workers Assets serves same origin in production.
   API_BASE_URL: '/api',
+  // Same-host WebSocket — proxied via Vite in dev (vite.config.js:139) and via Worker in prod
   WS_BASE_URL: `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws`
 };
 

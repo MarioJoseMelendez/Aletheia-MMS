@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently \"npm run dev:worker\" \"npm run dev:client\"",
-    "dev:worker": "wrangler dev",
+    "dev:worker": "wrangler dev --port 8787",
     "dev:client": "vite",
     "build": "vite build",
     "deploy": "npm run build && wrangler deploy"
