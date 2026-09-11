@@ -2,7 +2,7 @@ import{C as l}from"./constants-DQPtr3nP.js";class m{constructor(e){this.modal=do
         <tr>
           <td colspan="6" class="empty-table">No molecules registered yet. Click "+ New Molecule".</td>
         </tr>
-      `;return}e.forEach(t=>{const s=document.createElement("tr"),d=t.createdAt?new Date(t.createdAt).toLocaleDateString("es-ES"):"-";s.innerHTML=`
+      `;return}e.forEach(t=>{const s=document.createElement("tr"),d=t.createdAt?new Date(t.createdAt).toLocaleDateString("en-US"):"-";s.innerHTML=`
         <td><strong>${t.name}</strong></td>
         <td><span class="tag">${t.category||"General"}</span></td>
         <td>${t.atomCount||"Auto"}</td>

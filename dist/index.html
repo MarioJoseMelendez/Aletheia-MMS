@@ -1,104 +1,347 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Aletheia — Main Portal</title>
+  <title>Aletheia — Macromolecules Visor by Kahuna Labs</title>
+  <meta name="description" content="Aletheia: 3D Biological Macromolecule Simulator — A Kahuna Labs Project" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
+    /* ====================================================================
+       ====================================================================
+       {1} LANDING — ROOT DESIGN TOKENS
+       ====================================================================
+       Warm-tech palette inspired by the Kahuna Labs canvas identity.
+       Real blurred photography + glassmorphism + organic warmth.
+       ==================================================================== */
+
+    :root {
+      --warm-cream:    #f5f0e8;
+      --warm-gold:     #d4a853;
+      --warm-gold-bright: #e8c06a;
+      --nature-green:  #5a8c5a;
+      --sky-blue:      #7eb8c9;
+      --deep-earth:    #2a3228;
+      --deep-earth-90: rgba(42, 50, 40, 0.90);
+      --warm-overlay:  rgba(42, 50, 40, 0.55);
+      --glass-bg:      rgba(42, 50, 40, 0.45);
+      --glass-border:  rgba(245, 240, 232, 0.12);
+      --glass-border-hover: rgba(212, 168, 83, 0.35);
+      --text-muted:    rgba(245, 240, 232, 0.6);
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* ====================================================================
+       {2} BODY + BACKGROUND IMAGE
+       ==================================================================== */
     body {
-      background: #0a0a0f;
-      color: #ffffff;
       font-family: 'Inter', sans-serif;
+      color: var(--warm-cream);
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
+      padding: 40px 20px;
+      overflow-x: hidden;
+      background: var(--deep-earth);
     }
-    h1 {
-      font-size: 3rem;
-      color: #00d4aa;
-      margin-bottom: 10px;
-      letter-spacing: 2px;
+
+    /* {3} Blurred background photo — positioned absolute behind everything */
+    .bg-photo {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      filter: blur(8px) saturate(1.2) brightness(0.85);
+      transform: scale(1.05);
+      z-index: 0;
+      pointer-events: none;
     }
-    p {
-      color: #a0a0a0;
-      margin-bottom: 40px;
-      font-size: 1.1rem;
+
+    /* {4} Warm gradient overlay on top of the photo */
+    .bg-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(
+        160deg,
+        rgba(42, 50, 40, 0.65) 0%,
+        rgba(90, 140, 90, 0.20) 40%,
+        rgba(212, 168, 83, 0.15) 70%,
+        rgba(42, 50, 40, 0.75) 100%
+      );
+      z-index: 1;
+      pointer-events: none;
     }
+
+    /* ====================================================================
+       ====================================================================
+       {5} CONTENT LAYER
+       ====================================================================
+       Everything above the background.
+       ==================================================================== */
+    .content {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 1000px;
+      width: 100%;
+    }
+
+    /* ====================================================================
+       {6} BRANDING HEADER
+       ==================================================================== */
+    .brand-label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      opacity: 0;
+      animation: fadeInUp 0.8s ease forwards;
+      animation-delay: 0.1s;
+    }
+
+    .brand-label strong {
+      color: var(--warm-gold);
+      font-weight: 700;
+    }
+
+    /* ====================================================================
+       {7} HERO TITLE — MASSIVE BOLD
+       ==================================================================== */
+    .hero-title {
+      font-size: clamp(4rem, 12vw, 9rem);
+      font-weight: 900;
+      letter-spacing: -3px;
+      line-height: 0.9;
+      color: var(--warm-cream);
+      text-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+      margin-bottom: 12px;
+      opacity: 0;
+      animation: fadeInUp 1s ease forwards;
+      animation-delay: 0.25s;
+    }
+
+    .hero-subtitle {
+      font-size: 1.05rem;
+      font-weight: 300;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      margin-bottom: 60px;
+      opacity: 0;
+      animation: fadeInUp 0.8s ease forwards;
+      animation-delay: 0.5s;
+    }
+
+    .hero-subtitle a {
+      color: var(--warm-gold);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    .hero-subtitle a:hover {
+      color: var(--warm-gold-bright);
+    }
+
+    /* ====================================================================
+       ====================================================================
+       {8} GLASS CARDS GRID
+       ====================================================================
+       Glassmorphism cards with warm accents.
+       ==================================================================== */
     .cards {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 20px;
-      max-width: 900px;
       width: 100%;
     }
+
     .card {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      padding: 30px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 32px;
       text-decoration: none;
-      color: #fff;
-      transition: transform 0.2s, border-color 0.2s, background 0.2s;
+      color: var(--warm-cream);
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                  border-color 0.35s ease,
+                  background 0.35s ease,
+                  box-shadow 0.35s ease;
+      opacity: 0;
+      animation: fadeInUp 0.8s ease forwards;
     }
+
+    .card:nth-child(1) { animation-delay: 0.7s; }
+    .card:nth-child(2) { animation-delay: 0.85s; }
+    .card:nth-child(3) { animation-delay: 1.0s; }
+
     .card:hover {
-      transform: translateY(-5px);
-      border-color: #00d4aa;
-      background: rgba(0, 212, 170, 0.05);
+      transform: translateY(-6px);
+      border-color: var(--glass-border-hover);
+      background: rgba(42, 50, 40, 0.60);
+      box-shadow: 0 8px 32px rgba(212, 168, 83, 0.10),
+                  0 0 0 1px rgba(212, 168, 83, 0.08);
     }
-    .card-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #00d4aa;
-    }
-    .card-desc {
-      color: #808080;
-      font-size: 0.95rem;
-      line-height: 1.5;
-    }
+
+    /* ====================================================================
+       {9} CARD INTERIOR ELEMENTS
+       ==================================================================== */
     .badge {
       display: inline-block;
-      padding: 4px 10px;
+      padding: 4px 12px;
       border-radius: 20px;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       font-weight: 600;
-      background: rgba(255, 255, 255, 0.1);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      background: rgba(212, 168, 83, 0.15);
+      color: var(--warm-gold);
+      border: 1px solid rgba(212, 168, 83, 0.20);
       align-self: flex-start;
+    }
+
+    .card-icon {
+      font-size: 2.2rem;
+      line-height: 1;
+    }
+
+    .card-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--warm-cream);
+      letter-spacing: -0.5px;
+    }
+
+    .card-desc {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    /* ====================================================================
+       {10} FOOTER BRANDING
+       ==================================================================== */
+    .footer-brand {
+      margin-top: 60px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0;
+      animation: fadeInUp 0.6s ease forwards;
+      animation-delay: 1.3s;
+    }
+
+    .footer-brand .dot {
+      display: inline-block;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--warm-gold);
+      margin: 0 10px;
+      vertical-align: middle;
+    }
+
+    /* ====================================================================
+       {11} ANIMATIONS
+       ==================================================================== */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(25px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ====================================================================
+       {12} RESPONSIVE
+       ==================================================================== */
+    @media (max-width: 640px) {
+      body { padding: 30px 16px; }
+      .hero-title { letter-spacing: -1px; }
+      .cards { grid-template-columns: 1fr; }
+      .card { padding: 24px; }
     }
   </style>
 </head>
 <body>
 
-  <h1>ALETHEIA</h1>
-  <p>3D Biological Macromolecule Simulator</p>
+  <!-- ==================================================================
+       {1} BACKGROUND LAYER
+       ================================================================== -->
+  <img
+    src="/assets/bg-landing.png"
+    alt=""
+    class="bg-photo"
+    loading="eager"
+  />
+  <div class="bg-overlay"></div>
 
-  <div class="cards">
-    <a href="/src/display/" class="card">
-      <span class="badge">Screen 1</span>
-      <div class="card-title">📺 Exhibition</div>
-      <div class="card-desc">Fullscreen 3D visualization with pure black background and auto-rotation.</div>
-    </a>
+  <!-- ==================================================================
+       ==================================================================
+       {2} CONTENT
+       ==================================================================
+       Main landing content over the blurred photo background.
+       ================================================================== -->
+  <div class="content">
 
-    <a href="/src/control/" class="card">
-      <span class="badge">Screen 2</span>
-      <div class="card-title">🎮 Control</div>
-      <div class="card-desc">Interactive panel to rotate, change visual style, and control audio in real time.</div>
-    </a>
+    <!-- {3} Branding label -->
+    <p class="brand-label">Macromolecules Visor · By <strong>Kahuna Labs</strong></p>
 
-    <a href="/src/admin/" class="card">
-      <span class="badge">Administration</span>
-      <div class="card-title">🔧 Admin</div>
-      <div class="card-desc">Molecule management, .pdb file and audio upload via Drag &amp; Drop.</div>
-    </a>
+    <!-- {4} Hero title — massive bold like the canvas -->
+    <h1 class="hero-title">Aletheia</h1>
+    <p class="hero-subtitle"><a href="https://aletheia.kahuna.li" target="_blank">aletheia.kahuna.li</a></p>
+
+    <!-- {5} Navigation cards -->
+    <div class="cards">
+      <a href="/src/display/" class="card" id="card-exhibition">
+        <span class="badge">Screen 1</span>
+        <span class="card-icon">📺</span>
+        <div class="card-title">Exhibition</div>
+        <div class="card-desc">Fullscreen 3D visualization with pure black background and auto-rotation.</div>
+      </a>
+
+      <a href="/src/control/" class="card" id="card-control">
+        <span class="badge">Screen 2</span>
+        <span class="card-icon">🎮</span>
+        <div class="card-title">Control</div>
+        <div class="card-desc">Interactive panel to rotate, change visual style, and control audio in real time.</div>
+      </a>
+
+      <a href="/src/admin/" class="card" id="card-admin">
+        <span class="badge">Administration</span>
+        <span class="card-icon">🔧</span>
+        <div class="card-title">Admin</div>
+        <div class="card-desc">Molecule management, .pdb file and audio upload via Drag &amp; Drop.</div>
+      </a>
+    </div>
+
+    <!-- {6} Footer branding -->
+    <p class="footer-brand">
+      Kahuna Labs <span class="dot"></span> First Project <span class="dot"></span> 2025
+    </p>
   </div>
 
 </body>

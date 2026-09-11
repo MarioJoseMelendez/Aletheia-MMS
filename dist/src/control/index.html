@@ -1,35 +1,47 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Aletheia — Control</title>
-  <meta name="description" content="Aletheia: Control panel for macromolecule simulator" />
+  <meta name="description" content="Aletheia: Control panel for macromolecule simulator — Kahuna Labs" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <script type="module" crossorigin src="/assets/control-BW7ZGUSD.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script type="module" crossorigin src="/assets/control-C_i1jvxI.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/constants-DQPtr3nP.js">
-  <link rel="modulepreload" crossorigin href="/assets/molecule-loader-PT-tp0Tq.js">
-  <link rel="stylesheet" crossorigin href="/assets/control-BBwOnyUj.css">
+  <link rel="modulepreload" crossorigin href="/assets/molecule-loader-BgxfXXu4.js">
+  <link rel="stylesheet" crossorigin href="/assets/control-Dxt2PugZ.css">
 </head>
 <body>
 
   <!-- ==================================================================
+       {1} BACKGROUND LAYER
+       ================================================================== -->
+  <img
+    src="/assets/bg-control.png"
+    alt=""
+    class="bg-photo"
+    loading="eager"
+  />
+  <div class="bg-overlay"></div>
+
+  <!-- ==================================================================
        ==================================================================
-        {1} MAIN LAYOUT
+        {2} MAIN LAYOUT
        ==================================================================
         Two-column grid: left sidebar + right main area.
        ================================================================== -->
   <div id="app-layout">
 
     <!-- ==================================================================
-         {2} SIDEBAR — MOLECULE LIST
+         {3} SIDEBAR — MOLECULE LIST
          ================================================================== -->
     <aside id="sidebar">
       <div class="sidebar-header">
         <h1 class="app-title">Aletheia</h1>
         <p class="app-subtitle">Macromolecule Simulator</p>
+        <p class="sidebar-brand">By Kahuna Labs</p>
       </div>
 
       <div class="search-container">
@@ -45,28 +57,28 @@
     </aside>
 
     <!-- ==================================================================
-         {3} MAIN AREA
+         {4} MAIN AREA
          ================================================================== -->
     <main id="main-area">
 
-      <!-- {4} 3D Preview -->
+      <!-- {5} 3D Preview -->
       <section id="preview-section">
         <h2 class="section-title">Preview</h2>
         <div id="preview-container"></div>
       </section>
 
-      <!-- {5} Visualization controls -->
+      <!-- {6} Visualization controls -->
       <section id="controls-section">
         <h2 class="section-title">Visualization</h2>
         <div id="style-buttons">
           <button class="style-btn active" data-style="ball-and-stick">Ball &amp; Stick</button>
-          <button class="style-btn" data-style="spheres">Esferas</button>
+          <button class="style-btn" data-style="spheres">Spheres</button>
           <button class="style-btn" data-style="sticks">Sticks</button>
         </div>
         <button id="reset-view-btn" class="action-btn">Reset View</button>
       </section>
 
-      <!-- {6} Audio controls -->
+      <!-- {7} Audio controls -->
       <section id="audio-section">
         <h2 class="section-title">Audio</h2>
         <p id="audio-track-name">No audio selected</p>
