@@ -1,19 +1,27 @@
-name = "aletheia-backend"
+name = "aletheia"
 main = "worker/src/index.js"
 compatibility_date = "2024-07-20"
 
-[[kv_namespaces]]
-binding = "ALETHEIA_KV"
-id = "aletheia_kv"
+# Unified deploy: Worker serves API + static assets (Vite dist)
+# `npm run build` generates dist/ -> wrangler uploads it as static assets
+# Local: `npx wrangler dev` serves http://localhost:8787 with both API and assets (no Vite proxy needed)
+# Prod: single domain hosts frontend + /api + /ws
+[assets]
+directory = "./dist"
+not_found_handling = "single-page-application"
 
-[[r2_buckets]]
-binding = "ALETHEIA_STORAGE"
-bucket_name = "aletheia-storage"
-
-[[d1_databases]]
-binding = "DB"
-database_name = "aletheia-db"
-database_id = "local-d1-id"
+# KV / R2 / D1 disabled for initial deploy — Worker uses memory fallback (see worker/src/index.js:152,100)
+# To enable persistence, create real resources and uncomment:
+# [[kv_namespaces]]
+# binding = "ALETHEIA_KV"
+# id = "<real-kv-id>"
+# [[r2_buckets]]
+# binding = "ALETHEIA_STORAGE"
+# bucket_name = "aletheia-storage"
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "aletheia-db"
+# database_id = "<real-d1-id>"
 
 [durable_objects]
 bindings = [
@@ -22,4 +30,4 @@ bindings = [
 
 [[migrations]]
 tag = "v1"
-new_classes = ["SyncRoom"]
+new_sqlite_classes = ["SyncRoom"]
